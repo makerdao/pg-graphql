@@ -1,0 +1,13 @@
+{
+  "name": "dai-pg",
+  "version": "0.0.1",
+  "private": true,
+  "author": "dc",
+  "license": "GPL-3.0",
+  "dependencies": {
+    "dotenv": "^5.0.0",
+    "node-pg-migrate": "^2.18.0",
+    "pg-promise": "^7.4.1",
+    "web3": "^1.0.0-beta.29"
+  }
+}

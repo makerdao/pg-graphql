@@ -1,0 +1,38 @@
+#! /usr/bin/env node
+
+const Web3 = require('web3');
+const web3 = new Web3('wss://mainnet.infura.io/_ws');
+//var web3 = new Web3(Web3.givenProvider || new Web3.providers.WebsocketProvider('ws://rpc.makerdao.com:7777'));
+
+const FROM_BLOCK = web3.utils.toHex(5037000)
+const TO_BLOCK   = web3.utils.toHex(5037550)
+
+const options = {
+  fromBlock: FROM_BLOCK,
+  toBlock:   TO_BLOCK,
+  address:   "0x448a5065aebb8e423f0896e6c5d525c040f59af3" // ethlive tub
+}
+
+var open = web3.utils.sha3('LogNewCup(address,bytes32)');
+
+web3.eth.getPastLogs(options)
+.then(logs => {
+  logs.forEach(log => {
+    let topic = log.topics[0];
+    switch(topic) {
+      case open: {
+        console.log("Open:");
+        console.log(topic);
+      }
+      default: {
+        console.log("Unrecognised:");
+        console.log(topic);
+      }
+    }
+  });
+});
+
+// web3.eth.subscribe('logs', options)
+// .on("data", function(log) {
+//   console.log(log);
+// });
