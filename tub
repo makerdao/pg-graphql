@@ -1,0 +1,31 @@
+#! /usr/bin/env node
+
+const Web3 = require('web3');
+const web3 = new Web3('wss://mainnet.infura.io/_ws');
+
+const FROM_BLOCK = web3.utils.toHex(5037000)
+const TO_BLOCK   = web3.utils.toHex(5037550)
+
+const abi = require('./abi/tub.json').abi
+const adr = require('./addresses.json')
+const tub = new web3.eth.Contract(abi, adr.ethlive.tub)
+
+const options = {
+  fromBlock: FROM_BLOCK,
+  toBlock:   TO_BLOCK,
+}
+
+tub.getPastEvents('LogNewCup', options)
+.then(logs => {
+  logs.forEach(log => {
+    web3.eth.getBlock(log.blockNumber).then(block => {
+      let cup = {
+        id: web3.utils.hexToNumber(log.returnValues.cup),
+        lad: log.returnValues.lad,
+        block: log.blockNumber,
+        time: block.timestamp
+      }
+      console.log(cup);
+    });
+  });
+});

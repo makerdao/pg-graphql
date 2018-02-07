@@ -4,8 +4,8 @@ const Web3 = require('web3');
 const web3 = new Web3('wss://mainnet.infura.io/_ws');
 //var web3 = new Web3(Web3.givenProvider || new Web3.providers.WebsocketProvider('ws://rpc.makerdao.com:7777'));
 
-const FROM_BLOCK = web3.utils.toHex(5037000)
-const TO_BLOCK   = web3.utils.toHex(5037550)
+const FROM_BLOCK = web3.utils.toHex(5041000)
+const TO_BLOCK   = web3.utils.toHex(5045363)
 
 const options = {
   fromBlock: FROM_BLOCK,
@@ -14,25 +14,81 @@ const options = {
 }
 
 var open = web3.utils.sha3('LogNewCup(address,bytes32)');
+var abi = [
+  {
+    type: 'bytes4',
+    name: 'sig',
+    indexed: true
+  },
+  {
+    type: 'address',
+    name: 'guy',
+    indexed: true
+  },
+  {
+    type: 'bytes32',
+    name: 'foo',
+    indexed: true
+  },
+  {
+    type: 'bytes32',
+    name: 'bar',
+    indexed: true
+  },
+  {
+    type: 'uint',
+    name: 'wad'
+  },
+  {
+    type: 'bytes',
+    name: 'fax'
+  }
+]
+
+const sig = (str) => {
+  return web3.utils.sha3(str).substring(0,10)
+}
 
 web3.eth.getPastLogs(options)
 .then(logs => {
   logs.forEach(log => {
-    let topic = log.topics[0];
-    switch(topic) {
-      case open: {
-        console.log("Open:");
-        console.log(topic);
-      }
-      default: {
-        console.log("Unrecognised:");
-        console.log(topic);
-      }
+    //let note = web3.eth.abi.decodeLog(abi, log.data, log.topics);
+
+    switch(log.topics[0].substring(0,10)) {
+      case sig('LogNewCup(address,bytes32)'):
+        var cupID = web3.utils.hexToNumber(log.data);
+        var block = log.blockNumber;
+        console.log("Open: "+cupID);
+      case sig('join(uint)'):
+        console.log("Join:");
+      case sig('exit(uint)'):
+        console.log("Exit:");
+      case sig('give(bytes32,address)'):
+        console.log("Give:");
+      case sig('lock(bytes32,uint256)'):
+        console.log("Lock:");
+      case sig('free(bytes32,uint256)'):
+        console.log("Free:");
+      case sig('draw(bytes32,uint256)'):
+        console.log("Draw:");
+      case sig('wipe(bytes32,uint256)'):
+        console.log("Wipe:");
+      case sig('bite(bytes32)'):
+        console.log("Bite:");
+      case sig('shut(bytes32)'):
+        var cupID = web3.utils.hexToNumber(log.topics[2]);
+        var block = log.blockNumber;
+        console.log("Shut: "+cupID);
+      case sig('drip()'):
+      case sig('cage(uint,uint)'):
+      case sig('mint(address,uint)'):
+      case sig('burn(address,uint)'):
+      case sig('push(address,uint)'):
+      case sig('pull(address,uint)'):
+      default:
     }
   });
 });
 
 // web3.eth.subscribe('logs', options)
 // .on("data", function(log) {
-//   console.log(log);
-// });
