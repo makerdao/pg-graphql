@@ -1,0 +1,48 @@
+#! /usr/bin/env node
+
+import web3 from './config/web3'
+import {db,sql} from './config/db'
+import {sig,wad} from './utils'
+
+const FROM_BLOCK = web3.utils.toHex(5037000)
+const TO_BLOCK   = web3.utils.toHex(5037550)
+
+const abi = require('./abi/tub.json').abi
+const adr = require('./addresses.json')
+const tub = new web3.eth.Contract(abi, adr.ethlive.tub)
+
+const options = {
+  fromBlock: FROM_BLOCK,
+  toBlock:   TO_BLOCK,
+  filter: {
+    sig: sig('lock(bytes32,uint256)')
+  }
+}
+
+const insertCup = sql('insertCup.sql')
+
+tub.getPastEvents('LogNote', options)
+.then(logs => {
+  logs.forEach(log => {
+    web3.eth.getBlock(log.blockNumber).then(block => {
+      //web3.eth.defaultBlock = log.blockNumber
+      tub.methods.cups(log.returnValues.foo).call()
+        .then(rtn => {
+          let cup = {
+            id: web3.utils.hexToNumber(log.returnValues.foo),
+            lad: rtn.lad,
+            ink: wad(rtn.ink),
+            art: wad(rtn.art),
+            ire: wad(rtn.irk),
+            block: log.blockNumber,
+            timestamp: block.timestamp,
+            txHash: log.transactionHash,
+            action: 'lock'
+          }
+          db.none(insertCup, {cup: cup}).then(() => {
+            console.log(cup);
+          });
+        });
+    });
+  });
+});

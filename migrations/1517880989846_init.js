@@ -7,10 +7,7 @@ exports.up = (pgm) => {
       lad          CHARACTER VARYING(66)    NOT NULL,
       ink          CHARACTER VARYING(66)    NOT NULL DEFAULT 0,
       art          CHARACTER VARYING(66)    NOT NULL DEFAULT 0,
-      tab          CHARACTER VARYING(66)    NOT NULL DEFAULT 0,
       ire          CHARACTER VARYING(66)    NOT NULL DEFAULT 0,
-      rap          CHARACTER VARYING(66)    NOT NULL DEFAULT 0,
-      state        CHARACTER VARYING(10)    NOT NULL,
       block        BIGINT                   NOT NULL,
       timestamp    TIMESTAMPTZ              NOT NULL
     );
