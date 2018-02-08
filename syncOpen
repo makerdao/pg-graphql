@@ -1,9 +1,7 @@
-#! /usr/bin/env node
+import web3 from './config/web3'
+import { db, sql } from './config/db'
 
-const Web3 = require('web3');
-const web3 = new Web3('wss://mainnet.infura.io/_ws');
-
-const FROM_BLOCK = web3.utils.toHex(5037000)
+const FROM_BLOCK = web3.utils.toHex(5027000)
 const TO_BLOCK   = web3.utils.toHex(5037550)
 
 const abi = require('./abi/tub.json').abi
@@ -15,6 +13,8 @@ const options = {
   toBlock:   TO_BLOCK,
 }
 
+const insertCup = sql('insertCup.sql')
+
 tub.getPastEvents('LogNewCup', options)
 .then(logs => {
   logs.forEach(log => {
@@ -23,9 +23,14 @@ tub.getPastEvents('LogNewCup', options)
         id: web3.utils.hexToNumber(log.returnValues.cup),
         lad: log.returnValues.lad,
         block: log.blockNumber,
-        time: block.timestamp
+        timestamp: block.timestamp,
+        txHash: log.transactionHash,
+        action: 'open',
+        state: 'empty'
       }
-      console.log(cup);
+      db.none(insertCup, {cup: cup}).then(() => {
+        console.log(cup);
+      });
     });
   });
 });
