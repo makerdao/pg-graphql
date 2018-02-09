@@ -5,9 +5,10 @@ INSERT INTO cups (
   art,
   ire,
   block,
-  timestamp,
-  tx_hash,
-  action
+  time,
+  tx,
+  act,
+  arg
 )
 VALUES (
   ${cup.id},
@@ -16,11 +17,12 @@ VALUES (
   ${cup.art},
   ${cup.ire},
   ${cup.block},
-  to_timestamp(${cup.timestamp}),
-  ${cup.txHash},
-  ${cup.action}
+  to_timestamp(${cup.time}),
+  ${cup.tx},
+  ${cup.act},
+  ${cup.arg}
 )
 ON CONFLICT (
-  tx_hash
+  tx
 )
 DO NOTHING

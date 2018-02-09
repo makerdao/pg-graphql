@@ -1,94 +1,68 @@
 #! /usr/bin/env node
 
-const Web3 = require('web3');
-const web3 = new Web3('wss://mainnet.infura.io/_ws');
-//var web3 = new Web3(Web3.givenProvider || new Web3.providers.WebsocketProvider('ws://rpc.makerdao.com:7777'));
+import web3 from './config/web3'
+import {db,sql} from './config/db'
+import {wad,getCupAt} from './utils'
 
-const FROM_BLOCK = web3.utils.toHex(5041000)
-const TO_BLOCK   = web3.utils.toHex(5045363)
+const abi = require('./abi/tub.json').abi
+const adr = require('./addresses.json').ethlive.tub;
+const tub = new web3.eth.Contract(abi, adr);
+const actions = require('./actions.js');
+
+const insertCup = sql('insertCup.sql')
 
 const options = {
-  fromBlock: FROM_BLOCK,
-  toBlock:   TO_BLOCK,
-  address:   "0x448a5065aebb8e423f0896e6c5d525c040f59af3" // ethlive tub
+  // fromBlock: web3.utils.toHex(4753930),
+  // toBlock: 'latest',
+  fromBlock: web3.utils.toHex(4903930),
+  toBlock: web3.utils.toHex(4933930),
+  filter: { sig: actions.sigs }
 }
 
-var open = web3.utils.sha3('LogNewCup(address,bytes32)');
-var abi = [
-  {
-    type: 'bytes4',
-    name: 'sig',
-    indexed: true
-  },
-  {
-    type: 'address',
-    name: 'guy',
-    indexed: true
-  },
-  {
-    type: 'bytes32',
-    name: 'foo',
-    indexed: true
-  },
-  {
-    type: 'bytes32',
-    name: 'bar',
-    indexed: true
-  },
-  {
-    type: 'uint',
-    name: 'wad'
-  },
-  {
-    type: 'bytes',
-    name: 'fax'
-  }
-]
-
-const sig = (str) => {
-  return web3.utils.sha3(str).substring(0,10)
-}
-
-web3.eth.getPastLogs(options)
+tub.getPastEvents('LogNote', options)
 .then(logs => {
   logs.forEach(log => {
-    //let note = web3.eth.abi.decodeLog(abi, log.data, log.topics);
-
-    switch(log.topics[0].substring(0,10)) {
-      case sig('LogNewCup(address,bytes32)'):
-        var cupID = web3.utils.hexToNumber(log.data);
-        var block = log.blockNumber;
-        console.log("Open: "+cupID);
-      case sig('join(uint)'):
-        console.log("Join:");
-      case sig('exit(uint)'):
-        console.log("Exit:");
-      case sig('give(bytes32,address)'):
-        console.log("Give:");
-      case sig('lock(bytes32,uint256)'):
-        console.log("Lock:");
-      case sig('free(bytes32,uint256)'):
-        console.log("Free:");
-      case sig('draw(bytes32,uint256)'):
-        console.log("Draw:");
-      case sig('wipe(bytes32,uint256)'):
-        console.log("Wipe:");
-      case sig('bite(bytes32)'):
-        console.log("Bite:");
-      case sig('shut(bytes32)'):
-        var cupID = web3.utils.hexToNumber(log.topics[2]);
-        var block = log.blockNumber;
-        console.log("Shut: "+cupID);
-      case sig('drip()'):
-      case sig('cage(uint,uint)'):
-      case sig('mint(address,uint)'):
-      case sig('burn(address,uint)'):
-      case sig('push(address,uint)'):
-      case sig('pull(address,uint)'):
-      default:
-    }
+    web3.eth.getBlock(log.blockNumber).then(block => {
+      getCupAt(log.returnValues.foo, log.blockNumber).then(rtn => {
+        let cup = {
+          id: web3.utils.hexToNumber(log.returnValues.foo),
+          lad: rtn.lad,
+          ink: rtn.ink,
+          art: rtn.art,
+          ire: rtn.ire,
+          block: log.blockNumber,
+          time: block.timestamp,
+          tx: log.transactionHash,
+          act: actions.acts[log.returnValues.sig],
+          arg: wad('0x'+log.returnValues.bar.substring(26))
+        }
+        db.none(insertCup, {cup: cup}).then(() => {
+          console.log(cup);
+        });
+      })
+    });
   });
 });
 
-// web3.eth.subscribe('logs', options)
-// .on("data", function(log) {
+tub.getPastEvents('LogNewCup', options)
+.then(logs => {
+  logs.forEach(log => {
+    web3.eth.getBlock(log.blockNumber).then(block => {
+      let cup = {
+        id: web3.utils.hexToNumber(log.returnValues.cup),
+        lad: log.returnValues.lad,
+        ink: 0,
+        art: 0,
+        ire: 0,
+        block: log.blockNumber,
+        time: block.timestamp,
+        tx: log.transactionHash,
+        act: 'open',
+        arg: null
+      }
+      db.none(insertCup, {cup: cup}).then(() => {
+        console.log(cup);
+      });
+    });
+  });
+});
