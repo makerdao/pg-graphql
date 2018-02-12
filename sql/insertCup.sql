@@ -1,4 +1,4 @@
-INSERT INTO cups (
+INSERT INTO cup_actions (
   id,
   lad,
   ink,

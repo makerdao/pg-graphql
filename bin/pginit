@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+
+source .env
+
+PGPASSWORD=$PGPASSWORD psql -a --set=sslmode=require \
+  -h $PGHOST \
+  -d $PGDATABASE \
+  -U $PGUSER \
+  -p $PGPORT < sql/schema.sql

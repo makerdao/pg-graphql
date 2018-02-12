@@ -1,25 +1,22 @@
-#! /usr/bin/env node
+#!/usr/bin/env node
 
 import web3 from './config/web3'
-import {db,sql} from './config/db'
+import {db,sql,pgp} from './config/db'
 import {wad,getCupAt} from './utils'
 
 const abi = require('./abi/tub.json').abi
 const adr = require('./addresses.json').ethlive.tub;
 const tub = new web3.eth.Contract(abi, adr);
-const actions = require('./actions.js');
+const acts = require('./actions.js');
 
 const insertCup = sql('insertCup.sql')
 
 const options = {
-  // fromBlock: web3.utils.toHex(4753930),
-  // toBlock: 'latest',
-  fromBlock: web3.utils.toHex(4903930),
-  toBlock: web3.utils.toHex(4933930),
-  filter: { sig: actions.sigs }
+  fromBlock: web3.utils.toHex(process.env.FROM_BLOCK),
+  toBlock: web3.utils.toHex(process.env.TO_BLOCK)
 }
 
-tub.getPastEvents('LogNote', options)
+tub.getPastEvents('LogNote', Object.assign(options, {filter: {sig: acts.sigs}}))
 .then(logs => {
   logs.forEach(log => {
     web3.eth.getBlock(log.blockNumber).then(block => {
@@ -33,7 +30,7 @@ tub.getPastEvents('LogNote', options)
           block: log.blockNumber,
           time: block.timestamp,
           tx: log.transactionHash,
-          act: actions.acts[log.returnValues.sig],
+          act: acts.acts[log.returnValues.sig],
           arg: wad('0x'+log.returnValues.bar.substring(26))
         }
         db.none(insertCup, {cup: cup}).then(() => {

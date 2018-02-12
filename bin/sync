@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+
+from=4753930
+end=5003930
+step=5000
+
+while [ $from -le $end ]; do
+  to=$(($from+$step))
+  echo "Syncing $from - $to"
+  export FROM_BLOCK=$from
+  export TO_BLOCK=$to
+  node_modules/.bin/babel-node sync &
+  sleep 60
+  pkill node
+  start=$to
+done
+
