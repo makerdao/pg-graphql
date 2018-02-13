@@ -14,8 +14,30 @@ CREATE TABLE cup_actions (
   time  timestamptz not null
 );
 
+CREATE TABLE tub (
+  way
+  mat
+  per
+  din
+  air
+  pie
+  pip
+  pep
+  block
+  time
+);
+
 CREATE VIEW cups AS
-  SELECT * FROM (
+  SELECT (
+    id,
+    lad,
+    ink,
+    art,
+    ire,
+    block,
+    time
+  )
+  FROM (
     SELECT DISTINCT ON (id) *
     FROM cup_actions
     ORDER BY id DESC

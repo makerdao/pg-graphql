@@ -12,11 +12,20 @@ const hexOffset = (hex, n) => {
   return result
 }
 
-export const wad = (uint) => {
+const wad = (uint) => {
   return new BigNumber(uint).dividedBy(`1e18`).toNumber()
 }
 
-export const getCupAt = (cuphex, blk) => {
+const timestamp = (block) => {
+  return new Promise(resolve => {
+    web3.eth.getBlock(block).then(blk => {
+      console.log(blk.timestamp)
+      resolve(blk.timestamp)
+    })
+  })
+}
+
+const getCupAt = (cuphex, blk) => {
   let key = web3.utils.sha3(cuphex + cupSlot)
   return web3.eth.getStorageAt(tub, key, blk)
   .then(lad => {
@@ -36,4 +45,10 @@ export const getCupAt = (cuphex, blk) => {
       });
     });
   });
+}
+
+module.exports = {
+  wad: wad,
+  timestamp: timestamp,
+  getCupAt: getCupAt
 }
