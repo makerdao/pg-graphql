@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-import {web3, db, sql, acts, adresses} from './lib/common'
+import {web3, db, sql, acts, adresses, u} from './lib/common'
 const abi = require('./abi/tub.json').abi
 const tub = new web3.eth.Contract(abi, adresses.tub);
 
@@ -14,17 +14,17 @@ const options = {
 tub.getPastEvents('LogNote', Object.assign(options, {filter: {sig: acts.sigs}}))
 .then(logs => {
   logs.forEach(log => {
-    u.getCupAt(log.returnValues.foo, log.blockNumber).then(rtn => {
+    tub.methods.cups(log.returnValues.foo).call({}, log.blockNumber).then(cup => {
       let cupv = {
-        lad: rtn.lad,
-        ink: rtn.ink,
-        art: rtn.art,
-        ire: rtn.ire,
+        lad: cup.lad,
+        ink: u.wad(cup.ink),
+        art: u.wad(cup.art),
+        ire: u.wad(cup.irk),
         act: acts.acts[log.returnValues.sig],
         arg: u.wad('0x'+log.returnValues.bar.substring(26))
       }
       pgInsert(log, cupv)
-    })
+    });
   });
 });
 
