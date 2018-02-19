@@ -1,0 +1,27 @@
+#!/usr/bin/env node
+
+import {web3, db, sql, config, util, options} from './lib/common'
+const abi = require('./abi/tub.json').abi
+const tub = new web3.eth.Contract(abi, config.addresses.tub);
+
+tub.getPastEvents('LogNewCup', options).then(logs => {
+  logs.forEach(log => { insertCup(log) });
+});
+
+async function insertCup(log) {
+  let cup = {
+    id: web3.utils.hexToNumber(log.returnValues.cup),
+    lad: log.returnValues.lad,
+    ink: 0,
+    art: 0,
+    ire: 0,
+    act: 'open',
+    arg: null,
+    block: log.blockNumber,
+    time: await util.timestamp(log.blockNumber),
+    tx: log.transactionHash
+  }
+  db.none(sql.insertCup, {cup: cup}).then(() => {
+    console.log(cup);
+  });
+}

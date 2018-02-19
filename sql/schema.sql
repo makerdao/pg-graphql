@@ -1,5 +1,4 @@
-DROP TABLE IF EXISTS cup_actions;
-DROP VIEW IF EXISTS cups;
+DROP TABLE IF EXISTS cup_actions, pips, peps CASCADE;
 
 CREATE TABLE cup_actions (
   id    bigint not null,
@@ -14,29 +13,20 @@ CREATE TABLE cup_actions (
   time  timestamptz not null
 );
 
-CREATE TABLE tub (
-  way
-  mat
-  per
-  din
-  air
-  pie
-  pip
-  pep
-  block
-  time
+CREATE TABLE pips (
+  block bigint unique not null,
+  time  timestamptz not null,
+  val   character varying(66)
+);
+
+CREATE TABLE peps (
+  block bigint unique not null,
+  time  timestamptz not null,
+  val   character varying(66)
 );
 
 CREATE VIEW cups AS
   SELECT (
-    id,
-    lad,
-    ink,
-    art,
-    ire,
-    block,
-    time
-  )
   FROM (
     SELECT DISTINCT ON (id) *
     FROM cup_actions

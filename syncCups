@@ -1,0 +1,41 @@
+#!/usr/bin/env node
+
+import {web3, db, sql, config, util, options} from './lib/common'
+const abi = require('./abi/tub.json').abi
+const tub = new web3.eth.Contract(abi, config.addresses.tub);
+const filter = Object.assign(options, {filter: {sig: config.acts.sigs}})
+
+tub.getPastEvents('LogNote', filter)
+.then(logs => {
+  logs.forEach(log => {
+    tub.methods.cups(log.returnValues.foo).call({}, log.blockNumber).then(cup => {
+      let cupv = {
+        lad: cup.lad,
+        ink: util.wad(cup.ink),
+        art: util.wad(cup.art),
+        ire: util.wad(cup.irk),
+        act: config.acts.acts[log.returnValues.sig],
+        arg: util.wad('0x'+log.returnValues.bar.substring(26))
+      }
+      insertCup(log, cupv)
+    });
+  });
+});
+
+async function insertCup(log, cupv) {
+  let cup = {
+    id: web3.utils.hexToNumber(log.returnValues.foo),
+    lad: cupv.lad,
+    ink: cupv.ink,
+    art: cupv.art,
+    ire: cupv.ire,
+    block: log.blockNumber,
+    time: await util.timestamp(log.blockNumber),
+    tx: log.transactionHash,
+    act: config.acts.acts[log.returnValues.sig],
+    arg: util.wad('0x'+log.returnValues.bar.substring(26))
+  }
+  db.none(sql.insertCup, {cup: cup}).then(() => {
+    console.log(cup);
+  });
+}
