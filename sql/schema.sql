@@ -49,3 +49,10 @@ $$  LANGUAGE SQL;
 CREATE OR REPLACE FUNCTION cup_par(blk bigint) RETURNS text
 AS $$ SELECT val FROM pars WHERE pars.block <= $1 ORDER BY block DESC LIMIT 1;
 $$  LANGUAGE SQL;
+
+CREATE TABLE blocks (
+  n bigint unique not null,
+  time  timestamptz not null
+);
+
+CREATE INDEX block_n_index ON blocks(n);

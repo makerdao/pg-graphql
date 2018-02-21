@@ -1,0 +1,40 @@
+#!/usr/bin/env node
+
+const lib = require('./lib/common');
+const abi = require('./abi/med.json');
+const med = new lib.web3.eth.Contract(abi, lib.config.addresses.med);
+
+const syncBlock = (n) => {
+  lib.web3.eth.getBlock(n).then(rtn => {
+    writeBlock({ n: n, time: rtn.timestamp })
+  });
+}
+
+const writeBlock = (data) => {
+  lib.db.none(lib.sql.insertBlock, data)
+    .then(() => console.log("Block:", data));
+}
+
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+async function syncBlocks(from) {
+  console.log("Latest Block:", from);
+  await sleep(2000);
+  for (from; from > 4753930; from--) {
+    await sleep(500);
+    syncBlock(from);
+  }
+}
+
+lib.web3.eth.getBlockNumber().then(n => syncBlocks(n))
+
+lib.web3.eth.subscribe('newBlockHeaders', function(e,r) {
+  if (e)
+    console.log(e)
+})
+.on("data", function(data) {
+  console.log("New Header:", data);
+  writeBlock({ n: n, time: data.timestamp });
+});
