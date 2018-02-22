@@ -1,10 +1,14 @@
 INSERT INTO blocks (
   n,
-  time
+  time,
+  pip,
+  pep
 )
 VALUES (
   ${n},
-  to_timestamp(${time})
+  to_timestamp(${time}),
+  $(pip),
+  $(pep)
 )
 ON CONFLICT (
   n

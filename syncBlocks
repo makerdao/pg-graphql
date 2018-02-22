@@ -2,17 +2,33 @@
 
 const lib = require('./lib/common');
 const abi = require('./abi/med.json');
-const med = new lib.web3.eth.Contract(abi, lib.config.addresses.med);
+const pipMed = new lib.web3.eth.Contract(abi, lib.config.addresses.pip);
+const pepMed = new lib.web3.eth.Contract(abi, lib.config.addresses.pep);
 
 const syncBlock = (n) => {
-  lib.web3.eth.getBlock(n).then(rtn => {
-    writeBlock({ n: n, time: rtn.timestamp })
-  });
+  console.log("Sync: ", n);
+  lib.web3.eth.getBlock(n)
+  .then(rtn => writeBlock(n, rtn.timestamp))
+  .catch(e => console.log);
 }
 
-const writeBlock = (data) => {
-  lib.db.none(lib.sql.insertBlock, data)
-    .then(() => console.log("Block:", data));
+async function writeBlock(n, timestamp) {
+  pipMed.methods.peek().call({}, n)
+  .then(pip => {
+    pepMed.methods.peek().call({}, n)
+    .then(pep => {
+      let data = {
+        n: n,
+        time: timestamp,
+        pip: lib.util.wad(pip[0]),
+        pep: lib.util.wad(pep[0])
+      }
+      lib.db.none(lib.sql.insertBlock, data)
+      .then(() => console.log("Write:", data));
+    })
+    .catch(e => console.log);
+  })
+  .catch(e => console.log);
 }
 
 function sleep(ms) {
@@ -23,7 +39,7 @@ async function syncBlocks(from) {
   console.log("Latest Block:", from);
   await sleep(2000);
   for (from; from > 4753930; from--) {
-    await sleep(500);
+    await sleep(100);
     syncBlock(from);
   }
 }
