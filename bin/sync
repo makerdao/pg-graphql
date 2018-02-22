@@ -6,7 +6,8 @@
 
 earliest=4753930
 latest=5133409
-step=8000
+step=${2:-50}
+start=`date +%s`
 
 while [ $latest -ge $earliest ]; do
   from=$(($latest-$step))
@@ -14,7 +15,10 @@ while [ $latest -ge $earliest ]; do
   echo "Syncing $from - $to"
   export FROM_BLOCK=$from
   export TO_BLOCK=$to
-  node_modules/.bin/babel-node sync$1
+  node_modules/.bin/babel-node libexec/sync-$1
   latest=$from
 done
 
+end=`date +%s`
+runtime=$((end-start))
+echo "Completed in $runtime seconds"

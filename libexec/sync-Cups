@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
-import {web3, db, sql, config, util} from './lib/common'
-const abi = require('./abi/tub.json').abi
+import {web3, db, sql, config, util} from '../lib/common'
+const abi = require('../abi/tub.json').abi
 const tub = new web3.eth.Contract(abi, config.addresses.tub);
 
 const syncRange = (from, to) => {

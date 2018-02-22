@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
-const lib = require('./lib/common');
-const abi = require('./abi/tub.json').abi;
+const lib = require('../lib/common');
+const abi = require('../abi/tub.json').abi;
 const tub = new lib.web3.eth.Contract(abi, lib.config.addresses.tub);
 
 const syncRange = (from, to) => {
