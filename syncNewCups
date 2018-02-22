@@ -4,11 +4,14 @@ const lib = require('./lib/common');
 const abi = require('./abi/tub.json').abi;
 const tub = new lib.web3.eth.Contract(abi, lib.config.addresses.tub);
 
-tub.getPastEvents('LogNewCup', lib.options).then(logs => {
-  logs.forEach(log => { insertCup(log) });
-});
+const syncRange = (from, to) => {
+  console.log("SyncRange: "+from+" - "+to);
+  tub.getPastEvents('LogNewCup', { fromBlock: from, toBlock: to })
+  .then(logs => logs.forEach(log => insertCup(log) ))
+  .catch(e => console.log(e));
+}
 
-async function insertCup(log) {
+const insertCup = (log) => {
   let data = {
     id: lib.web3.utils.hexToNumber(log.returnValues.cup),
     lad: log.returnValues.lad,
@@ -18,10 +21,18 @@ async function insertCup(log) {
     act: 'open',
     arg: null,
     block: log.blockNumber,
-    time: await lib.util.timestamp(log.blockNumber),
     tx: log.transactionHash
   }
-  lib.db.none(lib.sql.insertCup, { cup: data }).then(() => {
-    console.log(data);
-  });
+  lib.db.none(lib.sql.insertCup, { cup: data }).then(() => console.log(data));
 }
+
+const syncCups = (earliest, latest) => {
+  let step = 2000;
+  while(latest > earliest) {
+    let from = latest-step;
+    syncRange(from, latest)
+    latest = from;
+  }
+}
+
+syncCups(process.env.FROM_BLOCK, process.env.TO_BLOCK)

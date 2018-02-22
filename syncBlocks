@@ -24,7 +24,7 @@ async function writeBlock(n, timestamp) {
         pep: lib.util.wad(pep[0])
       }
       lib.db.none(lib.sql.insertBlock, data)
-      .then(() => console.log("Write:", data));
+      .then(() => {})//console.log("Write:", data));
     })
     .catch(e => console.log);
   })
@@ -39,7 +39,7 @@ async function syncBlocks(from) {
   console.log("Latest Block:", from);
   await sleep(2000);
   for (from; from > 4753930; from--) {
-    await sleep(100);
+    await sleep(200);
     syncBlock(from);
   }
 }
