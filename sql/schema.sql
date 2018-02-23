@@ -24,13 +24,40 @@ CREATE TABLE blocks (
 CREATE INDEX block_n_index ON blocks(n);
 
 CREATE VIEW cup_history AS
-  SELECT *
+  SELECT
+    act,
+    arg,
+    art,
+    block,
+    id,
+    ink,
+    ire,
+    lad,
+    pip,
+    (pip::dec * ink::dec) / NULLIF(art::dec,0) * 100 AS ratio,
+    (pip::dec * ink::dec) AS tab,
+    time,
+    tx
   FROM cup_actions
   LEFT JOIN blocks on blocks.n = cup_actions.block
   ORDER BY block DESC;
 
 CREATE VIEW cups AS
-  SELECT * FROM (
+  SELECT
+    act,
+    arg,
+    art,
+    block,
+    id,
+    ink,
+    ire,
+    lad,
+    pip,
+    (pip::dec * ink::dec) / NULLIF(art::dec,0) * 100 AS ratio,
+    (pip::dec * ink::dec) AS tab,
+    time,
+    tx
+  FROM (
     SELECT DISTINCT ON (id) *
     FROM cup_actions
     LEFT JOIN blocks on blocks.n = cup_actions.block
