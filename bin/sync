@@ -5,7 +5,7 @@
 # step=5000
 
 earliest=4753930
-latest=5133409
+latest=5036175
 step=${2:-50}
 start=`date +%s`
 

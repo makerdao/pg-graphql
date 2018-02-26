@@ -11,7 +11,7 @@ const syncBlock = (n) => {
   .catch(e => console.log);
 }
 
-const writeBlock = (n, timestamp) => {
+export const writeBlock = (n, timestamp) => {
   console.log("Block:",n);
   pipMed.methods.peek().call({}, n)
   .then(pip => {
@@ -31,7 +31,7 @@ const writeBlock = (n, timestamp) => {
   .catch(e => console.log);
 }
 
-const syncBlocks = (from, to) => {
+export const syncBlocks = (from, to) => {
   while(to > from) {
     to = to-1;
     syncBlock(to);
@@ -39,14 +39,3 @@ const syncBlocks = (from, to) => {
 }
 
 syncBlocks(process.env.FROM_BLOCK, process.env.TO_BLOCK)
-
-//lib.web3.eth.getBlockNumber().then(n => syncBlocks(n))
-
-// lib.web3.eth.subscribe('newBlockHeaders', function(e,r) {
-//   if (e)
-//     console.log(e)
-// })
-// .on("data", function(data) {
-//   console.log("New Header:", data);
-//   writeBlock({ n: n, time: data.timestamp });
-// });
