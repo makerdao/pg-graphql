@@ -1,4 +1,4 @@
-INSERT INTO blocks (
+INSERT INTO block (
   n,
   time,
   pip,

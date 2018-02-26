@@ -2,6 +2,6 @@
 /coverage
 /build
 .DS_Store
-.env
+.env*
 package-lock.json
 npm-debug.log

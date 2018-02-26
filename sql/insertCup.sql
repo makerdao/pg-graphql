@@ -1,4 +1,4 @@
-INSERT INTO cup_actions (
+INSERT INTO private.cup_action (
   id,
   lad,
   ink,
