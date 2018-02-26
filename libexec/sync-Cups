@@ -27,7 +27,7 @@ const syncCup = (log) => {
       art: util.wad(cup.art),
       ire: util.wad(cup.irk),
       act: config.acts.acts[log.returnValues.sig],
-      arg: util.wad('0x'+log.returnValues.bar.substring(26)),
+      arg: util.arg(log.returnValues.bar),
       block: log.blockNumber,
       tx: log.transactionHash
     }
