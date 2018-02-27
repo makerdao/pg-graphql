@@ -2,7 +2,11 @@
 
 const args = process.argv.slice(2);
 const lib = require('../lib/common');
-const runner = require('../libexec/sync-Blocks');
+const blockRunner = require('../libexec/sync-Blocks');
+const cupRunner = require('../libexec/sync-Cups');
+const newCupRunner = require('../libexec/sync-NewCups');
+const abi = cupRunner.abi
+const tub = cupRunner.tub;
 const gen = 4753930;
 
 lib.web3.eth.getBlockNumber()
@@ -34,7 +38,7 @@ const syncMissing = (data) => {
     blocks.push(data[i]._n);
   }
   require('bluebird').map(blocks, (n) => {
-    return runner.syncBlock(n);
+    return blockRunner.syncBlock(n);
   }, {concurrency: 50})
 }
 
@@ -53,14 +57,46 @@ const sync = (earliest, latest) => {
 
 const batchSync = (blockRange, concurrency) => {
   require('bluebird').map(blockRange, (n) => {
-    return runner.syncBlock(n);
+    return blockRunner.syncBlock(n);
   }, {concurrency: concurrency})
 }
+
+// --------------------------------------------------------
+// Subscribe - Blocks
+// --------------------------------------------------------
 
 lib.web3.eth.subscribe('newBlockHeaders', (e,r) => {
   if (e)
     console.log(e)
 })
 .on("data", (data) => {
-  runner.writeBlock(data.number, data.timestamp);
+  blockRunner.writeBlock(data.number, data.timestamp);
 });
+
+// --------------------------------------------------------
+// Subscribe - Cup Logs
+// --------------------------------------------------------
+
+tub.events.LogNote({
+  filter: { sig: lib.acts.sigs }
+}, (e,r) => {
+  if (e)
+    console.log(e)
+})
+.on("data", (event) => {
+  cupRunner.syncCup(event);
+})
+.on("error", console.error);
+
+// --------------------------------------------------------
+// Subscribe - New Cups
+// --------------------------------------------------------
+
+tub.events.LogNewCup({}, (e,r) => {
+  if (e)
+    console.log(e)
+})
+.on("data", (event) => {
+  newCupRunner.insertCup(event);
+})
+.on("error", console.error);

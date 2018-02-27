@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 
 import {web3, db, sql, config, util} from '../lib/common'
-const abi = require('../abi/tub.json').abi
-const tub = new web3.eth.Contract(abi, config.addresses.tub);
+export const abi = require('../abi/tub.json').abi
+export const tub = new web3.eth.Contract(abi, config.addresses.tub);
 
 const syncRange = (from, to) => {
   console.log("SyncRange: "+from+" - "+to);
@@ -49,5 +49,3 @@ const syncCups = (earliest, latest) => {
 }
 
 syncCups(process.env.FROM_BLOCK, process.env.TO_BLOCK)
-
-//web3.eth.getBlockNumber().then(n => syncCups(n))
