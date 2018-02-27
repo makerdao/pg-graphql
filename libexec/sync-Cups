@@ -18,7 +18,7 @@ const syncRange = (from, to) => {
   .catch(e => console.log(e));
 }
 
-const syncCup = (log) => {
+export const syncCup = (log) => {
   tub.methods.cups(log.returnValues.foo).call({}, log.blockNumber).then(cup => {
     let cupv = {
       id: web3.utils.hexToNumber(log.returnValues.foo),

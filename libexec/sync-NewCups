@@ -11,7 +11,7 @@ const syncRange = (from, to) => {
   .catch(e => console.log(e));
 }
 
-const insertCup = (log) => {
+export const insertCup = (log) => {
   let data = {
     id: lib.web3.utils.hexToNumber(log.returnValues.cup),
     lad: log.returnValues.lad,

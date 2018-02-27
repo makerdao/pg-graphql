@@ -125,9 +125,12 @@ CREATE FUNCTION cup_history(cup cup) RETURNS setof cup_act as $$
   ORDER BY cup_act.block DESC
 $$ LANGUAGE SQL stable;
 
-CREATE FUNCTION get_cup(id integer) RETURNS cup as $$
+DROP FUNCTION get_cup(id integer);
+
+CREATE FUNCTION get_cup(id int) RETURNS cup as $$
   SELECT *
   FROM cup
-  WHERE cup.id = id
+  WHERE cup.id = $1
+  ORDER BY id DESC
   LIMIT 1
 $$ LANGUAGE SQL stable;
