@@ -5,3 +5,5 @@
 .env*
 package-lock.json
 npm-debug.log
+dist
+.eslintrc.json
