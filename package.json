@@ -4,6 +4,9 @@
   "private": true,
   "author": "dc",
   "license": "GPL-3.0",
+  "engines": {
+    "node": "8.9.4"
+  },
   "dependencies": {
     "babel-cli": "^6.26.0",
     "babel-core": "^6.26.0",
@@ -11,14 +14,15 @@
     "babel-preset-stage-2": "^6.24.1",
     "bignumber.js": "^6.0.0",
     "dotenv": "^5.0.0",
+    "express": "^4.16.2",
     "pg-promise": "^7.4.1",
     "web3": "^1.0.0-beta.29"
   },
   "scripts": {
     "clean": "rm -rf dist && mkdir dist",
-    "build": "babel -d dist/ bin/sync.js lib/*.js libexec/*",
-    "sync": "node dist/bin/sync.js",
-    "start": "babel-node bin/sync.js",
+    "build": "babel -d dist/ bin/sync.js lib/*.js libexec/* && cp lib/addresses.json dist/lib/addresses.json && cp -r abi dist/abi",
+    "sync": "babel-node bin/sync.js",
+    "start": "node dist/lib/server.js",
     "postinstall": "npm run build"
   }
 }
