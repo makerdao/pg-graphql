@@ -3,31 +3,58 @@
 const args = process.argv.slice(2);
 const lib = require('../lib/common');
 const runner = require('../libexec/sync-Blocks');
+const gen = 4753930;
 
-const fromBlock = args[0] || null;
-const toBlock   = args[1] || null;
-const batch     = args[2] || 50;
-
-const sync = (earliest, latest) => {
-  let diff = latest-earliest;
-  console.log("Latest:",latest,"Diff:",diff);
-  while(latest > earliest) {
-    let to   = latest;
-    let from = latest-batch;
-    console.log("Batch:",from,"-",to);
-    runner.syncBlocks(from, to);
-    latest = from;
-  }
-}
-
-if(fromBlock && toBlock) {
-  sync(fromBlock, toBlock);
-} else {
-  lib.web3.eth.getBlockNumber().then(latest => {
-    lib.db.one(lib.sql.lastBlock).then(earliest => {
-      sync(earliest.n, latest);
+lib.web3.eth.getBlockNumber()
+.then(to => {
+  lib.db.one(lib.sql.lastBlock)
+  .then(from => {
+    lib.db.any(lib.sql.missingBlocks, {from: gen, to: to})
+    .then(data => {
+      let earliest = from.n;
+      let latest   = to;
+      let diff = latest-earliest;
+      let info =`
+        Latest Block: ${latest}
+        Last Synced Block: ${earliest}
+        Diff: ${diff}
+        Missing: ${data.length}
+      `;
+      console.log(info);
+      sync(earliest, latest);
+      if(data.length > diff)
+        syncMissing(data);
     });
   });
+});
+
+const syncMissing = (data) => {
+  let blocks = [];
+  for (var i = 0; i < data.length; i ++) {
+    blocks.push(data[i]._n);
+  }
+  require('bluebird').map(blocks, (n) => {
+    return runner.syncBlock(n);
+  }, {concurrency: 50})
+}
+
+const range = (from, downTo) => {
+  let a=[from], b=from;
+  while(b>downTo) { b-=1; a.push(b); }
+  return a;
+}
+
+const sync = (earliest, latest) => {
+  let fromBlock   = args[0] || earliest;
+  let toBlock     = args[1] || latest;
+  let concurrency = args[2] || 50;
+  batchSync(range(toBlock, fromBlock), concurrency);
+}
+
+const batchSync = (blockRange, concurrency) => {
+  require('bluebird').map(blockRange, (n) => {
+    return runner.syncBlock(n);
+  }, {concurrency: concurrency})
 }
 
 lib.web3.eth.subscribe('newBlockHeaders', (e,r) => {

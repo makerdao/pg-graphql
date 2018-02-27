@@ -5,14 +5,14 @@ const abi = require('../abi/med.json');
 const pipMed = new lib.web3.eth.Contract(abi, lib.config.addresses.pip);
 const pepMed = new lib.web3.eth.Contract(abi, lib.config.addresses.pep);
 
-const syncBlock = (n) => {
+export const syncBlock = (n) => {
   lib.web3.eth.getBlock(n)
   .then(rtn => writeBlock(n, rtn.timestamp))
   .catch(e => console.log);
 }
 
 export const writeBlock = (n, timestamp) => {
-  console.log("Block:",n);
+  console.log("Write Block:",n);
   pipMed.methods.peek().call({}, n)
   .then(pip => {
     pepMed.methods.peek().call({}, n)
@@ -31,7 +31,7 @@ export const writeBlock = (n, timestamp) => {
   .catch(e => console.log);
 }
 
-export const syncBlocks = (from, to) => {
+const syncBlocks = (from, to) => {
   while(to > from) {
     to = to-1;
     syncBlock(to);
