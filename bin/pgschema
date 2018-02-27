@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+
+source .env
+
+PGPASSWORD=$PGPASSWORD pg_dump -v \
+  --schema-only \
+  --no-owner \
+  --no-privileges \
+  -f sql/schema.lock.sql \
+  -h $PGHOST \
+  -d $PGDATABASE \
+  -U $PGUSER \
+  -p $PGPORT
+
+cat sql/schema.lock.sql

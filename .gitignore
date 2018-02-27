@@ -7,3 +7,4 @@ package-lock.json
 npm-debug.log
 dist
 .eslintrc.json
+sql/schema.lock.sql
