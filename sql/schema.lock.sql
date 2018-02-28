@@ -5,7 +5,7 @@
 -- Dumped from database version 10.2 (Ubuntu 10.2-1.pgdg14.04+1)
 -- Dumped by pg_dump version 10.1
 
--- Started on 2018-02-28 03:12:31 UTC
+-- Started on 2018-02-27 23:44:57 UTC
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -16,47 +16,12 @@ SET check_function_bodies = false;
 SET client_min_messages = warning;
 SET row_security = off;
 
-SET search_path = private, pg_catalog;
-
-DROP INDEX private.cup_action_tx_index;
-DROP INDEX private.cup_action_id_index;
-DROP INDEX private.cup_action_block_index;
-SET search_path = public, pg_catalog;
-
-ALTER TABLE ONLY public.block DROP CONSTRAINT block_pkey;
-SET search_path = private, pg_catalog;
-
-ALTER TABLE ONLY private.cup_action DROP CONSTRAINT cup_action_tx_key;
-SET search_path = public, pg_catalog;
-
-DROP FUNCTION public.get_cup(id integer);
-DROP FUNCTION public.cup_history(cup cup);
-DROP VIEW public.cup_act;
-DROP VIEW public.cup;
-DROP TABLE public.block;
-SET search_path = private, pg_catalog;
-
-DROP TABLE private.cup_action;
-SET search_path = public, pg_catalog;
-
-DROP TYPE public.act;
-DROP EXTENSION plpgsql;
-DROP SCHEMA public;
-DROP SCHEMA private;
 --
 -- TOC entry 7 (class 2615 OID 9594966)
 -- Name: private; Type: SCHEMA; Schema: -; Owner: -
 --
 
 CREATE SCHEMA private;
-
-
---
--- TOC entry 8 (class 2615 OID 9594967)
--- Name: public; Type: SCHEMA; Schema: -; Owner: -
---
-
-CREATE SCHEMA public;
 
 
 --
@@ -455,7 +420,7 @@ $$;
 
 
 --
--- TOC entry 206 (class 1255 OID 10300806)
+-- TOC entry 202 (class 1255 OID 9810765)
 -- Name: get_cup(integer); Type: FUNCTION; Schema: public; Owner: -
 --
 
@@ -518,7 +483,7 @@ CREATE INDEX cup_action_id_index ON cup_action USING btree (id);
 CREATE INDEX cup_action_tx_index ON cup_action USING btree (tx);
 
 
--- Completed on 2018-02-28 03:13:28 UTC
+-- Completed on 2018-02-27 23:45:53 UTC
 
 --
 -- PostgreSQL database dump complete

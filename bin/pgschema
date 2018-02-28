@@ -1,15 +1,17 @@
 #!/usr/bin/env bash
 
+echo "Dumping schema to sql/schema.sql"
+
 source .env
 
-PGPASSWORD=$PGPASSWORD pg_dump -v \
+PGPASSWORD=$PGPASSWORD pg_dump -vc \
   --schema-only \
   --no-owner \
   --no-privileges \
-  -f sql/schema.lock.sql \
+  -f sql/schema.sql \
   -h $PGHOST \
   -d $PGDATABASE \
   -U $PGUSER \
   -p $PGPORT
 
-cat sql/schema.lock.sql
+cat sql/schema.sql
