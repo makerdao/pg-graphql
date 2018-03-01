@@ -2,15 +2,19 @@ INSERT INTO block (
   n,
   time,
   pip,
-  pep
+  pep,
+  per
 )
 VALUES (
   ${n},
   to_timestamp(${time}),
   $(pip),
-  $(pep)
+  $(pep),
+  $(per)
 )
-ON CONFLICT (
-  n
-)
-DO NOTHING
+ON CONFLICT (n)
+DO UPDATE
+SET
+pip = ${pip},
+pep = ${pep},
+per = ${per}
