@@ -1,2 +1,2 @@
 web: npm run start
-sync: npm run sync
+subscribe: npm run subscribe

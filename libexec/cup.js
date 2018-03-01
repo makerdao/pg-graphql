@@ -1,10 +1,10 @@
 const lib = require('../lib/common');
-export const abi = require('../abi/tub.json').abi;
+const abi = require('../abi/tub.json').abi;
 export const tub = new lib.web3.eth.Contract(abi, lib.addresses.tub);
 
 const syncNewCups = (from, to) => {
   tub.getPastEvents('LogNewCup', { fromBlock: from, toBlock: to })
-  .then(logs => logs.forEach(log => writeNewCup(log) ))
+  .then(logs => logs.forEach(log => write(log) ))
   .catch(e => console.log(e));
 }
 
@@ -15,11 +15,11 @@ const syncNotes = (from, to) => {
     filter: {sig: lib.acts.sigs}
   }
   tub.getPastEvents('LogNote', options)
-  .then(logs => logs.forEach(log => writeCup(log) ))
+  .then(logs => logs.forEach(log => update(log) ))
   .catch(e => console.log(e));
 }
 
-export const writeNewCup = (log) => {
+export const write = (log) => {
   let data = {
     id: lib.web3.utils.hexToNumber(log.returnValues.cup),
     lad: log.returnValues.lad,
@@ -34,7 +34,7 @@ export const writeNewCup = (log) => {
   insertCup(data);
 }
 
-export const writeCup = (log) => {
+export const update = (log) => {
   tub.methods.cups(log.returnValues.foo).call({}, log.blockNumber).then(cup => {
     let data = {
       id: lib.web3.utils.hexToNumber(log.returnValues.foo),
@@ -57,7 +57,7 @@ export const insertCup = (cup) => {
   .catch(e => console.log(e));
 }
 
-const syncCups = (earliest, latest) => {
+const syncRange = (earliest, latest) => {
   let step = 2000;
   while(latest > earliest) {
     let from = latest-step;
@@ -68,4 +68,4 @@ const syncCups = (earliest, latest) => {
   }
 }
 
-syncCups(process.env.FROM_BLOCK, process.env.TO_BLOCK)
+syncRange(process.env.FROM_BLOCK, process.env.TO_BLOCK)
