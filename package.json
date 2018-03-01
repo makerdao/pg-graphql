@@ -20,7 +20,7 @@
   },
   "scripts": {
     "clean": "rm -rf dist && mkdir dist",
-    "build": "babel -d dist/ bin/sync.js lib/*.js libexec/* && cp lib/addresses.json dist/lib/addresses.json && cp -r abi dist/abi",
+    "build": "babel -d dist/ bin/sync.js lib/*.js libexec/* && cp -r abi dist/abi",
     "sync": "babel-node bin/sync.js",
     "start": "node dist/lib/server.js",
     "postinstall": "npm run build"

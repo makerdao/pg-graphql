@@ -11,9 +11,5 @@
     "weth"  : "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
     "peth"  : "0xf53ad2c6851052a81b42133467480961b2321c09",
     "oasis" : "0x14FBCA95be7e99C15Cc2996c6C9d841e54B79425"
-  },
-  "kovan" : {
-    "tub"   : "0xa71937147b55deb8a530c7229c442fd3f31b7db2"
   }
-
 }
