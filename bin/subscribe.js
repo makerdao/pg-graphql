@@ -1,10 +1,10 @@
 const lib   = require('../lib/common');
 const block = require('../libexec/block');
 const cup   = require('../libexec/cup');
-const sync  = require('../bin/sync.js');
+const sync  = require('../libexec/sync-blocks.js');
 const tub   = cup.tub;
 
-sync.run();
+sync.sync();
 
 // --------------------------------------------------------
 // Subscribe - Blocks
