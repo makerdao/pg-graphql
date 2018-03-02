@@ -3,7 +3,7 @@ const lib   = require('../lib/common');
 const block = require('../libexec/block');
 
 const gen         = 4753930;
-const concurrency = 50;
+const concurrency = 100;
 const diff = (a, b) => a - b;
 const lastBlock = lib.web3.eth.getBlockNumber();
 
