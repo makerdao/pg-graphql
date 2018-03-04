@@ -11,8 +11,9 @@ CREATE VIEW public.cup_act AS
     ire,
     lad,
     pip,
-    (pip * per * ink) / NULLIF(art,0) * 100 AS ratio,
-    (pip * per * ink) AS tab,
+    per / 1000000000 AS per,
+    (pip * (per / 1000000000) * ink) / NULLIF(art,0) * 100 AS ratio,
+    (pip * (per / 1000000000) * ink) AS tab,
     time,
     tx
   FROM private.cup_action
@@ -29,6 +30,7 @@ comment on column cup_act.ink is 'Locked collateral PETH at block';
 comment on column cup_act.ire is 'Outstanding debt DAI after fee at block';
 comment on column cup_act.lad is 'The Cup owner';
 comment on column cup_act.pip is 'USD/ETH price at block';
+comment on column cup_act.per is 'ETH/PETH price at block';
 comment on column cup_act.ratio is 'Collateralization ratio at block';
 comment on column cup_act.tab is 'USD value of locked collateral at block';
 comment on column cup_act.time is 'Tx timestamp';
@@ -45,6 +47,7 @@ CREATE VIEW public.cup AS
     ire,
     lad,
     pip,
+    per,
     (pip * per * ink) / NULLIF(art,0) * 100 AS ratio,
     (pip * per * ink) AS tab,
     time
@@ -59,7 +62,7 @@ CREATE VIEW public.cup AS
       ire,
       lad,
       (SELECT pip FROM block ORDER BY n DESC LIMIT 1),
-      (SELECT per FROM block ORDER BY n DESC LIMIT 1),
+      (SELECT (per / 1000000000) FROM block ORDER BY n DESC LIMIT 1) AS per,
       (SELECT time FROM block WHERE block.n = cup_action.id)
     FROM private.cup_action
     ORDER BY private.cup_action.id DESC
@@ -76,6 +79,7 @@ comment on column cup.ink is 'Locked collateral PETH';
 comment on column cup.ire is 'Outstanding debt DAI after fee';
 comment on column cup.lad is 'The Cup owner';
 comment on column cup.pip is 'USD/ETH price';
+comment on column cup_act.per is 'ETH/PETH price';
 comment on column cup.ratio is 'Collateralization ratio';
 comment on column cup.tab is 'USD value of locked collateral';
 comment on column cup.time is 'Timestamp at last update';
