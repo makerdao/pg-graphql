@@ -39,7 +39,6 @@ comment on column cup_act.tx is 'Transaction hash';
 CREATE VIEW public.cup AS
   SELECT
     act,
-    arg,
     art,
     block,
     id,
@@ -54,7 +53,6 @@ CREATE VIEW public.cup AS
   FROM (
     SELECT DISTINCT ON (cup_action.id)
       act,
-      arg,
       art,
       block,
       id,

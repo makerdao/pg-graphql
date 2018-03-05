@@ -1,9 +1,5 @@
 #!/usr/bin/env bash
 
-# from=4753930
-# end=5127481
-# step=5000
-
 earliest=4753930
 latest=5163092
 step=${2:-50}
@@ -15,7 +11,7 @@ while [ $latest -ge $earliest ]; do
   echo "Syncing $from - $to"
   export FROM_BLOCK=$from
   export TO_BLOCK=$to
-  node_modules/.bin/babel-node libexec/sync-$1
+  node_modules/.bin/babel-node libexec/$1
   latest=$from
 done
 

@@ -5,7 +5,7 @@ CREATE OR REPLACE FUNCTION cup_history(cup cup) RETURNS setof cup_act as $$
   ORDER BY cup_act.block DESC
 $$ LANGUAGE SQL stable;
 
-CREATE OR REPLACE FUNCTION get_cup(id int) RETURNS cup as $$
+CREATE OR REPLACE FUNCTION get_cup(id integer) RETURNS cup as $$
   SELECT *
   FROM cup
   WHERE cup.id = $1
