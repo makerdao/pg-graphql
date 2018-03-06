@@ -1,42 +1,33 @@
 const lib = require('../lib/common');
 const abi = require('../abi/tub.json');
-export const tub = new lib.web3.eth.Contract(abi, lib.addresses.tub);
+const tub = new lib.web3.eth.Contract(abi, lib.addresses.tub);
 
-const syncNewCups = (from, to) => {
-  tub.getPastEvents('LogNewCup', { fromBlock: from, toBlock: to })
-  .then(logs => logs.forEach(log => write(log) ))
-  .catch(e => console.log(e));
-}
-
-const syncNotes = (from, to) => {
+export const sync = (from, to) => {
   let options = {
     fromBlock: from,
     toBlock: to,
     filter: {sig: lib.act.cupSigs}
   }
-  tub.getPastEvents('LogNote', options)
-  .then(logs => logs.forEach(log => update(log) ))
+  return tub.getPastEvents('LogNote', options)
+  .then(logs => logs.forEach(log => write(log) ))
   .catch(e => console.log(e));
 }
 
-export const write = (log) => {
-  let data = {
-    id: lib.web3.utils.hexToNumber(log.returnValues.cup),
-    lad: log.returnValues.lad,
-    ink: 0,
-    art: 0,
-    ire: 0,
-    act: 'open',
-    arg: null,
-    block: log.blockNumber,
-    tx: log.transactionHash
-  }
-  insertCup(data);
+export const subscribe = () => {
+  tub.events.LogNote({
+    filter: { sig: lib.act.cupSigs }
+  }, (e,r) => {
+    if (e)
+      console.log(e)
+  })
+  .on("data", (event) => cup.update(event))
+  .on("error", console.log);
 }
 
-export const update = (log) => {
-  tub.methods.cups(log.returnValues.foo).call({}, log.blockNumber).then(cup => {
-    let data = {
+const read = (log) => {
+  return tub.methods.cups(log.returnValues.foo).call({}, log.blockNumber)
+  .then(cup => {
+    return {
       id: lib.web3.utils.hexToNumber(log.returnValues.foo),
       lad: cup.lad,
       ink: lib.u.wad(cup.ink),
@@ -47,25 +38,14 @@ export const update = (log) => {
       block: log.blockNumber,
       tx: log.transactionHash
     }
-    insertCup(data);
   });
 }
 
-export const insertCup = (cup) => {
-  lib.db.none(lib.sql.insertCup, { cup: cup })
-  .then(() => console.log(cup))
+const write = (log) => {
+  return read(log)
+  .then(data => {
+    lib.db.none(lib.sql.insertCup, { cup: data })
+    console.log(data)
+  })
   .catch(e => console.log(e));
 }
-
-const syncRange = (earliest, latest) => {
-  let step = 2000;
-  while(latest > earliest) {
-    let from = latest-step;
-    console.log("SyncRange:",earliest,"-",latest);
-    syncNewCups(from, latest);
-    syncNotes(from, latest);
-    latest = from;
-  }
-}
-
-syncRange(process.env.FROM_BLOCK, process.env.TO_BLOCK)

@@ -1,59 +1,16 @@
-const lib   = require('../lib/common');
-const block = require('../libexec/block');
-const cup   = require('../libexec/cup');
-const sync  = require('../libexec/sync-blocks.js');
-const gov   = require('../libexec/gov.js');
-const tub   = cup.tub;
+const lib       = require('../lib/common');
 
-sync.sync();
+const block  = require('../libexec/block');
+const newCup = require('../libexec/new-cup');
+const cup    = require('../libexec/cup');
+const gov    = require('../libexec/gov.js');
 
-// --------------------------------------------------------
-// Subscribe - Blocks
-// --------------------------------------------------------
+// Ensure that blocks are fully synced
+//block.syncMissing();
 
-lib.web3.eth.subscribe('newBlockHeaders', (e,r) => {
-  if (e)
-    console.log(e)
-})
-.on("data", (data) => {
-  block.write(data.number, data.timestamp);
-});
-
-// --------------------------------------------------------
-// Subscribe - Cup Logs
-// --------------------------------------------------------
-
-tub.events.LogNote({
-  filter: { sig: lib.act.cupSigs }
-}, (e,r) => {
-  if (e)
-    console.log(e)
-})
-.on("data", (event) => cup.update(event))
-.on("error", console.log);
-
-// --------------------------------------------------------
-// Subscribe - New Cups
-// --------------------------------------------------------
-
-tub.events.LogNewCup({}, (e,r) => {
-  if (e)
-    console.log(e)
-})
-.on("data", (event) => cup.write(event))
-.on("error", console.log);
-
-// --------------------------------------------------------
-// Subscribe - Gov Events
-// --------------------------------------------------------
-
-const genBlock = 4753930;
-
-lib.web3.eth.getBlockNumber()
-.then(latest => {
-
-  gov.sync(genBlock, latest);
-  gov.subscribe();
-
-})
-.catch(e => console.log(e));
+// Subscribe to new log events
+console.log("Subscribing: blocks, cups, new cups, gov...")
+block.subscribe();
+gov.subscribe();
+newCup.subscribe();
+cup.subscribe();

@@ -10,7 +10,7 @@ export const sync = (from, to) => {
       sig: lib.act.dict.mold
     }
   }
-  tub.getPastEvents('LogNote', options)
+  return tub.getPastEvents('LogNote', options)
   .then(logs => logs.forEach(log => write(log) ))
   .catch(e => console.log(e));
 }
