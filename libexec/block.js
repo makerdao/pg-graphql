@@ -1,6 +1,6 @@
 const lib = require('../lib/common');
 const abi = require('../abi/med.json');
-const abI = require('../abi/tub.json').abi;
+const abI = require('../abi/tub.json');
 const pip = new lib.web3.eth.Contract(abi, lib.addresses.pip);
 const pep = new lib.web3.eth.Contract(abi, lib.addresses.pep);
 const tub = new lib.web3.eth.Contract(abI, lib.addresses.tub);

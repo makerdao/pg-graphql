@@ -2,6 +2,7 @@ const lib   = require('../lib/common');
 const block = require('../libexec/block');
 const cup   = require('../libexec/cup');
 const sync  = require('../libexec/sync-blocks.js');
+const gov   = require('../libexec/gov.js');
 const tub   = cup.tub;
 
 sync.sync();
@@ -23,14 +24,12 @@ lib.web3.eth.subscribe('newBlockHeaders', (e,r) => {
 // --------------------------------------------------------
 
 tub.events.LogNote({
-  filter: { sig: lib.acts.sigs }
+  filter: { sig: lib.act.cupSigs }
 }, (e,r) => {
   if (e)
     console.log(e)
 })
-.on("data", (event) => {
-  cup.update(event);
-})
+.on("data", (event) => cup.update(event))
 .on("error", console.log);
 
 // --------------------------------------------------------
@@ -41,7 +40,20 @@ tub.events.LogNewCup({}, (e,r) => {
   if (e)
     console.log(e)
 })
-.on("data", (event) => {
-  cup.write(event);
-})
+.on("data", (event) => cup.write(event))
 .on("error", console.log);
+
+// --------------------------------------------------------
+// Subscribe - Gov Events
+// --------------------------------------------------------
+
+const genBlock = 4753930;
+
+lib.web3.eth.getBlockNumber()
+.then(latest => {
+
+  gov.sync(genBlock, latest);
+  gov.subscribe();
+
+})
+.catch(e => console.log(e));

@@ -1,5 +1,5 @@
 const lib = require('../lib/common');
-const abi = require('../abi/tub.json').abi;
+const abi = require('../abi/tub.json');
 export const tub = new lib.web3.eth.Contract(abi, lib.addresses.tub);
 
 const syncNewCups = (from, to) => {
@@ -12,7 +12,7 @@ const syncNotes = (from, to) => {
   let options = {
     fromBlock: from,
     toBlock: to,
-    filter: {sig: lib.acts.sigs}
+    filter: {sig: lib.act.cupSigs}
   }
   tub.getPastEvents('LogNote', options)
   .then(logs => logs.forEach(log => update(log) ))
@@ -41,8 +41,8 @@ export const update = (log) => {
       lad: cup.lad,
       ink: lib.u.wad(cup.ink),
       art: lib.u.wad(cup.art),
-      ire: lib.u.wad(cup.irk),
-      act: lib.acts.acts[log.returnValues.sig],
+      ire: lib.u.wad(cup.ire),
+      act: lib.act.cupActs[log.returnValues.sig],
       arg: lib.u.arg(log.returnValues.bar),
       block: log.blockNumber,
       tx: log.transactionHash
