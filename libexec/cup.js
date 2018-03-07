@@ -20,7 +20,7 @@ export const subscribe = () => {
     if (e)
       console.log(e)
   })
-  .on("data", (event) => cup.update(event))
+  .on("data", (event) => write(event))
   .on("error", console.log);
 }
 

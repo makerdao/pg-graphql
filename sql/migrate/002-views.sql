@@ -65,7 +65,7 @@ CREATE VIEW public.cup AS
       lad,
       (SELECT pip FROM block ORDER BY n DESC LIMIT 1),
       (SELECT (per / 1000000000) FROM block ORDER BY n DESC LIMIT 1) AS per,
-      (SELECT time FROM block WHERE block.n = cup_action.id)
+      (SELECT time FROM block WHERE block.n = private.cup_action.block)
     FROM private.cup_action
     ORDER BY private.cup_action.id DESC
   )
