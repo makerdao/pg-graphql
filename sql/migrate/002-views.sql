@@ -12,9 +12,9 @@ CREATE VIEW public.cup_act AS
     ire,
     lad,
     pip,
-    per / 1000000000 AS per,
-    (pip * (per / 1000000000) * ink) / NULLIF(art,0) * 100 AS ratio,
-    (pip * (per / 1000000000) * ink) AS tab,
+    per,
+    (pip * per * ink) / NULLIF(art,0) * 100 AS ratio,
+    (pip * per * ink) AS tab,
     time,
     tx
   FROM private.cup_action
@@ -64,7 +64,7 @@ CREATE VIEW public.cup AS
       ire,
       lad,
       (SELECT pip FROM block ORDER BY n DESC LIMIT 1),
-      (SELECT (per / 1000000000) FROM block ORDER BY n DESC LIMIT 1) AS per,
+      (SELECt per FROM block ORDER BY n DESC LIMIT 1) AS per,
       (SELECT time FROM block WHERE block.n = private.cup_action.block)
     FROM private.cup_action
     ORDER BY private.cup_action.id DESC

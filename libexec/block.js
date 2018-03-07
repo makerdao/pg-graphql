@@ -28,7 +28,7 @@ const write = (n, timestamp) => {
       time: timestamp,
       pip: lib.u.wad(val[0][0]),
       pep: lib.u.wad(val[1][0]),
-      per: lib.u.wad(val[2])
+      per: lib.u.ray(val[2])
     }
   })
   .then(data => {

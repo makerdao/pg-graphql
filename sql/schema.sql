@@ -5,7 +5,7 @@
 -- Dumped from database version 10.2 (Ubuntu 10.2-1.pgdg14.04+1)
 -- Dumped by pg_dump version 10.1
 
--- Started on 2018-03-05 02:29:32 UTC
+-- Started on 2018-03-07 07:42:54 UTC
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -19,6 +19,12 @@ SET row_security = off;
 SET search_path = private, pg_catalog;
 
 DROP TRIGGER shut ON private.cup_action;
+SET search_path = public, pg_catalog;
+
+DROP INDEX public.gov_tx_index;
+DROP INDEX public.gov_block_index;
+SET search_path = private, pg_catalog;
+
 DROP INDEX private.cup_action_tx_index;
 DROP INDEX private.cup_action_id_index;
 DROP INDEX private.cup_action_deleted_index;
@@ -26,12 +32,14 @@ DROP INDEX private.cup_action_block_index;
 DROP INDEX private.cup_action_act_index;
 SET search_path = public, pg_catalog;
 
+ALTER TABLE ONLY public.gov DROP CONSTRAINT gov_tx_key;
 ALTER TABLE ONLY public.block DROP CONSTRAINT block_pkey;
 SET search_path = private, pg_catalog;
 
 ALTER TABLE ONLY private.cup_action DROP CONSTRAINT cup_action_tx_key;
 SET search_path = public, pg_catalog;
 
+DROP TABLE public.gov;
 DROP FUNCTION public.get_cup(id integer);
 DROP FUNCTION public.exec_set_deleted();
 DROP FUNCTION public.cup_history(cup cup);
@@ -72,7 +80,7 @@ CREATE EXTENSION IF NOT EXISTS plpgsql WITH SCHEMA pg_catalog;
 
 
 --
--- TOC entry 3715 (class 0 OID 0)
+-- TOC entry 3730 (class 0 OID 0)
 -- Dependencies: 1
 -- Name: EXTENSION plpgsql; Type: COMMENT; Schema: -; Owner: -
 --
@@ -83,7 +91,7 @@ COMMENT ON EXTENSION plpgsql IS 'PL/pgSQL procedural language';
 SET search_path = public, pg_catalog;
 
 --
--- TOC entry 591 (class 1247 OID 9594969)
+-- TOC entry 592 (class 1247 OID 9594969)
 -- Name: act; Type: TYPE; Schema: public; Owner: -
 --
 
@@ -142,7 +150,7 @@ CREATE TABLE block (
 
 
 --
--- TOC entry 200 (class 1259 OID 10931489)
+-- TOC entry 201 (class 1259 OID 11093401)
 -- Name: cup; Type: VIEW; Schema: public; Owner: -
 --
 
@@ -150,6 +158,7 @@ CREATE VIEW cup AS
  SELECT c.act,
     c.art,
     c.block,
+    c.deleted,
     c.id,
     c.ink,
     c.ire,
@@ -162,6 +171,7 @@ CREATE VIEW cup AS
    FROM ( SELECT DISTINCT ON (cup_action.id) cup_action.act,
             cup_action.art,
             cup_action.block,
+            cup_action.deleted,
             cup_action.id,
             cup_action.ink,
             cup_action.ire,
@@ -170,20 +180,20 @@ CREATE VIEW cup AS
                    FROM block
                   ORDER BY block.n DESC
                  LIMIT 1) AS pip,
-            ( SELECT (block.per / (1000000000)::numeric)
+            ( SELECT block.per
                    FROM block
                   ORDER BY block.n DESC
                  LIMIT 1) AS per,
             ( SELECT block."time"
                    FROM block
-                  WHERE (block.n = cup_action.id)) AS "time"
+                  WHERE (block.n = cup_action.block)) AS "time"
            FROM private.cup_action
           ORDER BY cup_action.id DESC) c;
 
 
 --
--- TOC entry 3716 (class 0 OID 0)
--- Dependencies: 200
+-- TOC entry 3731 (class 0 OID 0)
+-- Dependencies: 201
 -- Name: VIEW cup; Type: COMMENT; Schema: public; Owner: -
 --
 
@@ -191,8 +201,8 @@ COMMENT ON VIEW cup IS 'A CDP record';
 
 
 --
--- TOC entry 3717 (class 0 OID 0)
--- Dependencies: 200
+-- TOC entry 3732 (class 0 OID 0)
+-- Dependencies: 201
 -- Name: COLUMN cup.act; Type: COMMENT; Schema: public; Owner: -
 --
 
@@ -200,8 +210,8 @@ COMMENT ON COLUMN cup.act IS 'The most recent act';
 
 
 --
--- TOC entry 3718 (class 0 OID 0)
--- Dependencies: 200
+-- TOC entry 3733 (class 0 OID 0)
+-- Dependencies: 201
 -- Name: COLUMN cup.art; Type: COMMENT; Schema: public; Owner: -
 --
 
@@ -209,8 +219,8 @@ COMMENT ON COLUMN cup.art IS 'Outstanding debt DAI';
 
 
 --
--- TOC entry 3719 (class 0 OID 0)
--- Dependencies: 200
+-- TOC entry 3734 (class 0 OID 0)
+-- Dependencies: 201
 -- Name: COLUMN cup.block; Type: COMMENT; Schema: public; Owner: -
 --
 
@@ -218,8 +228,8 @@ COMMENT ON COLUMN cup.block IS 'Block number at last update';
 
 
 --
--- TOC entry 3720 (class 0 OID 0)
--- Dependencies: 200
+-- TOC entry 3735 (class 0 OID 0)
+-- Dependencies: 201
 -- Name: COLUMN cup.id; Type: COMMENT; Schema: public; Owner: -
 --
 
@@ -227,8 +237,8 @@ COMMENT ON COLUMN cup.id IS 'The Cup ID';
 
 
 --
--- TOC entry 3721 (class 0 OID 0)
--- Dependencies: 200
+-- TOC entry 3736 (class 0 OID 0)
+-- Dependencies: 201
 -- Name: COLUMN cup.ink; Type: COMMENT; Schema: public; Owner: -
 --
 
@@ -236,8 +246,8 @@ COMMENT ON COLUMN cup.ink IS 'Locked collateral PETH';
 
 
 --
--- TOC entry 3722 (class 0 OID 0)
--- Dependencies: 200
+-- TOC entry 3737 (class 0 OID 0)
+-- Dependencies: 201
 -- Name: COLUMN cup.ire; Type: COMMENT; Schema: public; Owner: -
 --
 
@@ -245,8 +255,8 @@ COMMENT ON COLUMN cup.ire IS 'Outstanding debt DAI after fee';
 
 
 --
--- TOC entry 3723 (class 0 OID 0)
--- Dependencies: 200
+-- TOC entry 3738 (class 0 OID 0)
+-- Dependencies: 201
 -- Name: COLUMN cup.lad; Type: COMMENT; Schema: public; Owner: -
 --
 
@@ -254,8 +264,8 @@ COMMENT ON COLUMN cup.lad IS 'The Cup owner';
 
 
 --
--- TOC entry 3724 (class 0 OID 0)
--- Dependencies: 200
+-- TOC entry 3739 (class 0 OID 0)
+-- Dependencies: 201
 -- Name: COLUMN cup.pip; Type: COMMENT; Schema: public; Owner: -
 --
 
@@ -263,8 +273,8 @@ COMMENT ON COLUMN cup.pip IS 'USD/ETH price';
 
 
 --
--- TOC entry 3725 (class 0 OID 0)
--- Dependencies: 200
+-- TOC entry 3740 (class 0 OID 0)
+-- Dependencies: 201
 -- Name: COLUMN cup.ratio; Type: COMMENT; Schema: public; Owner: -
 --
 
@@ -272,8 +282,8 @@ COMMENT ON COLUMN cup.ratio IS 'Collateralization ratio';
 
 
 --
--- TOC entry 3726 (class 0 OID 0)
--- Dependencies: 200
+-- TOC entry 3741 (class 0 OID 0)
+-- Dependencies: 201
 -- Name: COLUMN cup.tab; Type: COMMENT; Schema: public; Owner: -
 --
 
@@ -281,8 +291,8 @@ COMMENT ON COLUMN cup.tab IS 'USD value of locked collateral';
 
 
 --
--- TOC entry 3727 (class 0 OID 0)
--- Dependencies: 200
+-- TOC entry 3742 (class 0 OID 0)
+-- Dependencies: 201
 -- Name: COLUMN cup."time"; Type: COMMENT; Schema: public; Owner: -
 --
 
@@ -290,7 +300,7 @@ COMMENT ON COLUMN cup."time" IS 'Timestamp at last update';
 
 
 --
--- TOC entry 199 (class 1259 OID 10931478)
+-- TOC entry 200 (class 1259 OID 11093396)
 -- Name: cup_act; Type: VIEW; Schema: public; Owner: -
 --
 
@@ -299,14 +309,15 @@ CREATE VIEW cup_act AS
     cup_action.arg,
     cup_action.art,
     cup_action.block,
+    cup_action.deleted,
     cup_action.id,
     cup_action.ink,
     cup_action.ire,
     cup_action.lad,
     block.pip,
-    (block.per / (1000000000)::numeric) AS per,
-    ((((block.pip * (block.per / (1000000000)::numeric)) * cup_action.ink) / NULLIF(cup_action.art, (0)::numeric)) * (100)::numeric) AS ratio,
-    ((block.pip * (block.per / (1000000000)::numeric)) * cup_action.ink) AS tab,
+    block.per,
+    ((((block.pip * block.per) * cup_action.ink) / NULLIF(cup_action.art, (0)::numeric)) * (100)::numeric) AS ratio,
+    ((block.pip * block.per) * cup_action.ink) AS tab,
     block."time",
     cup_action.tx
    FROM (private.cup_action
@@ -315,8 +326,8 @@ CREATE VIEW cup_act AS
 
 
 --
--- TOC entry 3728 (class 0 OID 0)
--- Dependencies: 199
+-- TOC entry 3743 (class 0 OID 0)
+-- Dependencies: 200
 -- Name: VIEW cup_act; Type: COMMENT; Schema: public; Owner: -
 --
 
@@ -324,8 +335,8 @@ COMMENT ON VIEW cup_act IS 'A CDP action';
 
 
 --
--- TOC entry 3729 (class 0 OID 0)
--- Dependencies: 199
+-- TOC entry 3744 (class 0 OID 0)
+-- Dependencies: 200
 -- Name: COLUMN cup_act.act; Type: COMMENT; Schema: public; Owner: -
 --
 
@@ -333,8 +344,8 @@ COMMENT ON COLUMN cup_act.act IS 'The action name';
 
 
 --
--- TOC entry 3730 (class 0 OID 0)
--- Dependencies: 199
+-- TOC entry 3745 (class 0 OID 0)
+-- Dependencies: 200
 -- Name: COLUMN cup_act.arg; Type: COMMENT; Schema: public; Owner: -
 --
 
@@ -342,8 +353,8 @@ COMMENT ON COLUMN cup_act.arg IS 'Data associated with the act';
 
 
 --
--- TOC entry 3731 (class 0 OID 0)
--- Dependencies: 199
+-- TOC entry 3746 (class 0 OID 0)
+-- Dependencies: 200
 -- Name: COLUMN cup_act.art; Type: COMMENT; Schema: public; Owner: -
 --
 
@@ -351,8 +362,8 @@ COMMENT ON COLUMN cup_act.art IS 'Outstanding debt DAI at block';
 
 
 --
--- TOC entry 3732 (class 0 OID 0)
--- Dependencies: 199
+-- TOC entry 3747 (class 0 OID 0)
+-- Dependencies: 200
 -- Name: COLUMN cup_act.block; Type: COMMENT; Schema: public; Owner: -
 --
 
@@ -360,8 +371,17 @@ COMMENT ON COLUMN cup_act.block IS 'Tx block number';
 
 
 --
--- TOC entry 3733 (class 0 OID 0)
--- Dependencies: 199
+-- TOC entry 3748 (class 0 OID 0)
+-- Dependencies: 200
+-- Name: COLUMN cup_act.deleted; Type: COMMENT; Schema: public; Owner: -
+--
+
+COMMENT ON COLUMN cup_act.deleted IS 'True if the cup has been deleted (shut)';
+
+
+--
+-- TOC entry 3749 (class 0 OID 0)
+-- Dependencies: 200
 -- Name: COLUMN cup_act.id; Type: COMMENT; Schema: public; Owner: -
 --
 
@@ -369,8 +389,8 @@ COMMENT ON COLUMN cup_act.id IS 'The Cup ID';
 
 
 --
--- TOC entry 3734 (class 0 OID 0)
--- Dependencies: 199
+-- TOC entry 3750 (class 0 OID 0)
+-- Dependencies: 200
 -- Name: COLUMN cup_act.ink; Type: COMMENT; Schema: public; Owner: -
 --
 
@@ -378,8 +398,8 @@ COMMENT ON COLUMN cup_act.ink IS 'Locked collateral PETH at block';
 
 
 --
--- TOC entry 3735 (class 0 OID 0)
--- Dependencies: 199
+-- TOC entry 3751 (class 0 OID 0)
+-- Dependencies: 200
 -- Name: COLUMN cup_act.ire; Type: COMMENT; Schema: public; Owner: -
 --
 
@@ -387,8 +407,8 @@ COMMENT ON COLUMN cup_act.ire IS 'Outstanding debt DAI after fee at block';
 
 
 --
--- TOC entry 3736 (class 0 OID 0)
--- Dependencies: 199
+-- TOC entry 3752 (class 0 OID 0)
+-- Dependencies: 200
 -- Name: COLUMN cup_act.lad; Type: COMMENT; Schema: public; Owner: -
 --
 
@@ -396,8 +416,8 @@ COMMENT ON COLUMN cup_act.lad IS 'The Cup owner';
 
 
 --
--- TOC entry 3737 (class 0 OID 0)
--- Dependencies: 199
+-- TOC entry 3753 (class 0 OID 0)
+-- Dependencies: 200
 -- Name: COLUMN cup_act.pip; Type: COMMENT; Schema: public; Owner: -
 --
 
@@ -405,8 +425,8 @@ COMMENT ON COLUMN cup_act.pip IS 'USD/ETH price at block';
 
 
 --
--- TOC entry 3738 (class 0 OID 0)
--- Dependencies: 199
+-- TOC entry 3754 (class 0 OID 0)
+-- Dependencies: 200
 -- Name: COLUMN cup_act.per; Type: COMMENT; Schema: public; Owner: -
 --
 
@@ -414,8 +434,8 @@ COMMENT ON COLUMN cup_act.per IS 'ETH/PETH price';
 
 
 --
--- TOC entry 3739 (class 0 OID 0)
--- Dependencies: 199
+-- TOC entry 3755 (class 0 OID 0)
+-- Dependencies: 200
 -- Name: COLUMN cup_act.ratio; Type: COMMENT; Schema: public; Owner: -
 --
 
@@ -423,8 +443,8 @@ COMMENT ON COLUMN cup_act.ratio IS 'Collateralization ratio at block';
 
 
 --
--- TOC entry 3740 (class 0 OID 0)
--- Dependencies: 199
+-- TOC entry 3756 (class 0 OID 0)
+-- Dependencies: 200
 -- Name: COLUMN cup_act.tab; Type: COMMENT; Schema: public; Owner: -
 --
 
@@ -432,8 +452,8 @@ COMMENT ON COLUMN cup_act.tab IS 'USD value of locked collateral at block';
 
 
 --
--- TOC entry 3741 (class 0 OID 0)
--- Dependencies: 199
+-- TOC entry 3757 (class 0 OID 0)
+-- Dependencies: 200
 -- Name: COLUMN cup_act."time"; Type: COMMENT; Schema: public; Owner: -
 --
 
@@ -441,8 +461,8 @@ COMMENT ON COLUMN cup_act."time" IS 'Tx timestamp';
 
 
 --
--- TOC entry 3742 (class 0 OID 0)
--- Dependencies: 199
+-- TOC entry 3758 (class 0 OID 0)
+-- Dependencies: 200
 -- Name: COLUMN cup_act.tx; Type: COMMENT; Schema: public; Owner: -
 --
 
@@ -450,7 +470,7 @@ COMMENT ON COLUMN cup_act.tx IS 'Transaction hash';
 
 
 --
--- TOC entry 206 (class 1255 OID 10931510)
+-- TOC entry 203 (class 1255 OID 11093406)
 -- Name: cup_history(cup); Type: FUNCTION; Schema: public; Owner: -
 --
 
@@ -465,7 +485,7 @@ $$;
 
 
 --
--- TOC entry 207 (class 1255 OID 10931018)
+-- TOC entry 208 (class 1255 OID 10931018)
 -- Name: exec_set_deleted(); Type: FUNCTION; Schema: public; Owner: -
 --
 
@@ -482,7 +502,7 @@ $$;
 
 
 --
--- TOC entry 211 (class 1255 OID 10931511)
+-- TOC entry 209 (class 1255 OID 11093407)
 -- Name: get_cup(integer); Type: FUNCTION; Schema: public; Owner: -
 --
 
@@ -497,10 +517,30 @@ CREATE FUNCTION get_cup(id integer) RETURNS cup
 $_$;
 
 
+--
+-- TOC entry 199 (class 1259 OID 11059535)
+-- Name: gov; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE gov (
+    block integer NOT NULL,
+    tx character varying(66) NOT NULL,
+    var character varying(10) NOT NULL,
+    arg character varying(66),
+    guy character varying(66),
+    cap numeric DEFAULT 0 NOT NULL,
+    mat numeric DEFAULT 0 NOT NULL,
+    tax numeric DEFAULT 0 NOT NULL,
+    fee numeric DEFAULT 0 NOT NULL,
+    axe numeric DEFAULT 0 NOT NULL,
+    gap numeric DEFAULT 0 NOT NULL
+);
+
+
 SET search_path = private, pg_catalog;
 
 --
--- TOC entry 3585 (class 2606 OID 9595005)
+-- TOC entry 3596 (class 2606 OID 9595005)
 -- Name: cup_action cup_action_tx_key; Type: CONSTRAINT; Schema: private; Owner: -
 --
 
@@ -511,7 +551,7 @@ ALTER TABLE ONLY cup_action
 SET search_path = public, pg_catalog;
 
 --
--- TOC entry 3578 (class 2606 OID 9594994)
+-- TOC entry 3589 (class 2606 OID 9594994)
 -- Name: block block_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -519,10 +559,19 @@ ALTER TABLE ONLY block
     ADD CONSTRAINT block_pkey PRIMARY KEY (n);
 
 
+--
+-- TOC entry 3600 (class 2606 OID 11059548)
+-- Name: gov gov_tx_key; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY gov
+    ADD CONSTRAINT gov_tx_key UNIQUE (tx);
+
+
 SET search_path = private, pg_catalog;
 
 --
--- TOC entry 3579 (class 1259 OID 10930893)
+-- TOC entry 3590 (class 1259 OID 10930893)
 -- Name: cup_action_act_index; Type: INDEX; Schema: private; Owner: -
 --
 
@@ -530,7 +579,7 @@ CREATE INDEX cup_action_act_index ON cup_action USING btree (act);
 
 
 --
--- TOC entry 3580 (class 1259 OID 9595007)
+-- TOC entry 3591 (class 1259 OID 9595007)
 -- Name: cup_action_block_index; Type: INDEX; Schema: private; Owner: -
 --
 
@@ -538,7 +587,7 @@ CREATE INDEX cup_action_block_index ON cup_action USING btree (block);
 
 
 --
--- TOC entry 3581 (class 1259 OID 10930892)
+-- TOC entry 3592 (class 1259 OID 10930892)
 -- Name: cup_action_deleted_index; Type: INDEX; Schema: private; Owner: -
 --
 
@@ -546,7 +595,7 @@ CREATE INDEX cup_action_deleted_index ON cup_action USING btree (deleted);
 
 
 --
--- TOC entry 3582 (class 1259 OID 9595006)
+-- TOC entry 3593 (class 1259 OID 9595006)
 -- Name: cup_action_id_index; Type: INDEX; Schema: private; Owner: -
 --
 
@@ -554,22 +603,42 @@ CREATE INDEX cup_action_id_index ON cup_action USING btree (id);
 
 
 --
--- TOC entry 3583 (class 1259 OID 9595008)
+-- TOC entry 3594 (class 1259 OID 9595008)
 -- Name: cup_action_tx_index; Type: INDEX; Schema: private; Owner: -
 --
 
 CREATE INDEX cup_action_tx_index ON cup_action USING btree (tx);
 
 
+SET search_path = public, pg_catalog;
+
 --
--- TOC entry 3586 (class 2620 OID 10931019)
+-- TOC entry 3597 (class 1259 OID 11059549)
+-- Name: gov_block_index; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX gov_block_index ON gov USING btree (block);
+
+
+--
+-- TOC entry 3598 (class 1259 OID 11059550)
+-- Name: gov_tx_index; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX gov_tx_index ON gov USING btree (tx);
+
+
+SET search_path = private, pg_catalog;
+
+--
+-- TOC entry 3601 (class 2620 OID 10931019)
 -- Name: cup_action shut; Type: TRIGGER; Schema: private; Owner: -
 --
 
 CREATE TRIGGER shut AFTER INSERT ON cup_action FOR EACH ROW WHEN ((new.act = 'shut'::public.act)) EXECUTE PROCEDURE public.exec_set_deleted();
 
 
--- Completed on 2018-03-05 02:30:38 UTC
+-- Completed on 2018-03-07 07:44:11 UTC
 
 --
 -- PostgreSQL database dump complete
