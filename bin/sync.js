@@ -6,22 +6,28 @@ const cup    = require('../libexec/cup');
 const newCup = require('../libexec/new-cup');
 const step   = 5000;
 
+// Backfill any blocks missing from the cache or
+// Overwrite all cached blocks prior to BLOCK if
+// present
 if(process.env.BLOCK) {
-  console.log("Re-syncing cached blocks...");
+  console.log("Syncing up to", process.env.BLOCK);
   block.syncFrom(process.env.BLOCK);
 } else {
   console.log("Syncing missing blocks...");
   block.syncMissing();
 }
 
+// Get the latest block so that we can sync
+// backwards to the deployment block gen.
 lib.latestBlock
-.then(latest => {
-  console.log("Syncing cups, new cups, gov...");
-  batchSync(lib.genBlock, latest);
-})
+.then(latest => batchSync(lib.genBlock, latest))
 .catch(e => console.log(e));
 
-
+// Conservatively sync large ranges in batches
+// to allow syncing against infura.
+// Convenience & reliablility over speed.
+// Tasks contained in batches run asyncronously
+// batches run one at a time.
 const batchSync = (earliest, latest) => {
   const batches = (to, arr=[]) => {
     arr.push({from: to-step, to: to })
@@ -36,7 +42,12 @@ const batchSync = (earliest, latest) => {
   .then(() => console.log("batchSync complete"));
 }
 
+// Sync on all of the logs we're interested in
+// gov events
+// cup events
+// new-cup events
 const execSync = (from, to) => {
+  console.log("Syncing gov, cups, new cups...");
   return gov.sync(from, to)
   .then(() => cup.sync(from, to))
   .then(() => newCup.sync(from, to))
