@@ -6,7 +6,7 @@ const cup    = require('../libexec/cup');
 const gov    = require('../libexec/gov.js');
 
 // Ensure that blocks are fully synced
-//block.syncMissing();
+block.syncMissing();
 
 // Subscribe to new log events
 console.log("Subscribing: blocks, cups, new cups, gov...")

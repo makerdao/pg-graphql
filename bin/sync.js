@@ -16,21 +16,21 @@ if(process.env.BLOCK) {
 
 lib.latestBlock
 .then(latest => {
-  console.log("Syncing cups, new cups, gov...")
-  batchSync(lib.genBlock, latest)
+  console.log("Syncing cups, new cups, gov...");
+  batchSync(lib.genBlock, latest);
 })
 .catch(e => console.log(e));
 
+
 const batchSync = (earliest, latest) => {
-  let arr = []
-  while(latest > earliest - step) {
-    let from = latest - step;
-    let obj = {from: from, to: latest}
-    arr.push(obj);
-    latest-=step;
+  const batches = (to, arr=[]) => {
+    arr.push({from: to-step, to: to })
+    if(to < earliest-step)
+      return arr;
+    else
+      return batches(to-step, arr);
   }
-  require('bluebird').map(arr, (o) => {
-    console.log(o);
+  require('bluebird').map(batches(latest), (o) => {
     return execSync(o.from, o.to);
   }, {concurrency: 1})
   .then(() => console.log("batchSync complete"));
@@ -42,4 +42,3 @@ const execSync = (from, to) => {
   .then(() => newCup.sync(from, to))
   .catch(e => console.log(e));
 }
-
