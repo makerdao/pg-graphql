@@ -14,17 +14,21 @@
     "babel-preset-stage-2": "^6.24.1",
     "bignumber.js": "^6.0.0",
     "dotenv": "^5.0.0",
+    "ejs": "^2.5.7",
     "express": "^4.16.2",
     "pg-promise": "^7.4.1",
+    "postgraphile": "^4.0.0-alpha2.33",
+    "postgraphile-plugin-connection-filter": "^1.0.0-alpha.9",
     "ramda": "^0.25.0",
     "web3": "^1.0.0-beta.29"
   },
   "scripts": {
-    "clean": "rm -rf dist && mkdir dist",
-    "build": "babel -d dist/ bin/*.js lib/*.js libexec/* && cp -r abi dist/abi",
     "sync": "babel-node bin/sync.js",
     "subscribe": "babel-node bin/subscribe.js",
-    "serve": "node dist/lib/server.js",
+    "graphql": "babel-node graphql/server.js",
+    "clean": "rm -rf dist && mkdir dist",
+    "build": "babel -d dist/ graphql/",
+    "serve": "node dist/server.js",
     "postinstall": "npm run build"
   }
 }

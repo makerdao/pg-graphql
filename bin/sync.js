@@ -47,7 +47,6 @@ const batchSync = (earliest, latest) => {
 // cup events
 // new-cup events
 const execSync = (from, to) => {
-  console.log("Syncing gov, cups, new cups...");
   return gov.sync(from, to)
   .then(() => cup.sync(from, to))
   .then(() => newCup.sync(from, to))
