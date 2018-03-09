@@ -67,7 +67,7 @@ CREATE VIEW public.cup AS
       (SELECt per FROM block ORDER BY n DESC LIMIT 1) AS per,
       (SELECT time FROM block WHERE block.n = private.cup_action.block)
     FROM private.cup_action
-    ORDER BY private.cup_action.id DESC
+    ORDER BY private.cup_action.id DESC, private.cup_action.block DESC
   )
 c;
 
