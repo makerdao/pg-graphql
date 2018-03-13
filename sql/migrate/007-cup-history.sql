@@ -1,15 +1,15 @@
-DROP TYPE IF EXISTS public.interval;
-CREATE TYPE interval AS enum (
+DROP TYPE IF EXISTS tick_interval CASCADE;
+CREATE TYPE tick_interval AS enum (
   'minute',
   'hour',
   'day',
   'week',
   'month',
-  'year'
+  'quarter'
 );
 
-DROP TYPE IF EXISTS public.cup_history_interval CASCADE;
-CREATE TYPE public.cup_history_interval AS (
+DROP TYPE IF EXISTS cup_state CASCADE;
+CREATE TYPE cup_state AS (
   tick       timestamptz,
   min_pip    numeric,
   max_pip    numeric,
@@ -24,8 +24,8 @@ CREATE TYPE public.cup_history_interval AS (
   time       timestamptz
 );
 
-CREATE OR REPLACE FUNCTION cup_history(id integer,tick char)
-RETURNS SETOF cup_history_interval as $$
+CREATE OR REPLACE FUNCTION cup_history(cup cup,tick tick_interval)
+RETURNS SETOF cup_state as $$
   WITH acts AS (
     SELECT
       act,
@@ -36,7 +36,7 @@ RETURNS SETOF cup_history_interval as $$
       LEAD(time) OVER (ORDER BY time ASC) AS next_time
     FROM private.cup_action
     LEFT JOIN block on block.n = private.cup_action.block
-    WHERE private.cup_action.id = $1
+    WHERE private.cup_action.id = cup.id
   ), ticks AS (
     SELECT
       date_trunc($2::char, time) AS tick,

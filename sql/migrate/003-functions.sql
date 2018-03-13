@@ -1,4 +1,4 @@
-CREATE OR REPLACE FUNCTION cup_history(cup cup) RETURNS setof cup_act as $$
+CREATE OR REPLACE FUNCTION cup_actions(cup cup) RETURNS setof cup_act as $$
   SELECT *
   FROM cup_act
   WHERE cup_act.id = cup.id
