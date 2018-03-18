@@ -27,14 +27,16 @@ export const subscribe = () => {
 const read = (log) => {
   return tub.methods.cups(log.returnValues.foo).call({}, log.blockNumber)
   .then(cup => {
+    let act = lib.act.cupActs[log.returnValues.sig];
     return {
       id: lib.web3.utils.hexToNumber(log.returnValues.foo),
       lad: cup.lad,
       ink: lib.u.wad(cup.ink),
       art: lib.u.wad(cup.art),
       ire: lib.u.wad(cup.ire),
-      act: lib.act.cupActs[log.returnValues.sig],
-      arg: lib.u.arg(log.returnValues.bar),
+      act: act,
+      arg: lib.u.arg(act, log.returnValues.bar),
+      guy: log.returnValues.guy, // msg.sender
       block: log.blockNumber,
       tx: log.transactionHash
     }
@@ -45,7 +47,7 @@ const write = (log) => {
   return read(log)
   .then(data => {
     lib.db.none(lib.sql.insertCup, { cup: data })
-    console.log(data)
+    console.log(data);
   })
   .catch(e => console.log(e));
 }
