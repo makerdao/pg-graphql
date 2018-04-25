@@ -19,7 +19,8 @@ const graphqlConfig = {
   graphiql: true,
   graphqlRoute: '/v1',
   graphiqlRoute: '/v1/console',
-  appendPlugins: [FilterPlugin]
+  appendPlugins: [FilterPlugin],
+  enableCors: true
 }
 
 const limiter = new RateLimit({
