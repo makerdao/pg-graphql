@@ -22,7 +22,5 @@ VALUES (
   ${cup.arg},
   ${cup.guy}
 )
-ON CONFLICT (
-  tx
-)
+ON CONFLICT (tx, act, arg)
 DO NOTHING
