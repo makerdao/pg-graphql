@@ -37,6 +37,7 @@ const read = (log) => {
       act: act,
       arg: lib.u.arg(act, log.returnValues.bar),
       guy: log.returnValues.guy, // msg.sender
+      idx: log.transactionIndex,
       block: log.blockNumber,
       tx: log.transactionHash
     }

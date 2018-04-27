@@ -9,6 +9,7 @@ CREATE VIEW public.cup_act AS
     deleted,
     guy,
     id,
+    idx,
     ink,
     ire,
     lad,
@@ -31,6 +32,7 @@ comment on column cup_act.deleted is 'True if the cup has been deleted (shut)';
 comment on column cup_act.guy is 'msg.sender';
 comment on column cup_act.id is 'The Cup ID';
 comment on column cup_act.ink is 'Locked collateral PETH at block';
+comment on column cup_act.idx is 'Transaction index';
 comment on column cup_act.ire is 'Outstanding debt DAI after fee at block';
 comment on column cup_act.lad is 'The Cup owner';
 comment on column cup_act.pip is 'USD/ETH price at block';
@@ -47,6 +49,7 @@ CREATE VIEW public.cup AS
     block,
     deleted,
     id,
+    idx,
     guy,
     ink,
     ire,
@@ -63,6 +66,7 @@ CREATE VIEW public.cup AS
       block,
       deleted,
       id,
+      idx,
       guy,
       ink,
       ire,
@@ -83,6 +87,7 @@ comment on column cup_act.deleted is 'True if the cup has been deleted (shut)';
 comment on column cup.id is 'The Cup ID';
 comment on column cup.guy is 'msg.sender';
 comment on column cup.ink is 'Locked collateral PETH';
+comment on column cup.idx is 'Transaction index';
 comment on column cup.ire is 'Outstanding debt DAI after fee';
 comment on column cup.lad is 'The Cup owner';
 comment on column cup.pip is 'USD/ETH price';

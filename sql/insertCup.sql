@@ -8,7 +8,8 @@ INSERT INTO private.cup_action (
   tx,
   act,
   arg,
-  guy
+  guy,
+  idx
 )
 VALUES (
   ${cup.id},
@@ -20,7 +21,8 @@ VALUES (
   ${cup.tx},
   ${cup.act},
   ${cup.arg},
-  ${cup.guy}
+  ${cup.guy},
+  ${cup.idx}
 )
 ON CONFLICT (tx, act, arg)
 DO NOTHING
