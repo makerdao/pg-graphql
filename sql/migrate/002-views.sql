@@ -7,6 +7,7 @@ CREATE VIEW public.cup_act AS
     art,
     block,
     deleted,
+    guy,
     id,
     ink,
     ire,
@@ -27,6 +28,7 @@ comment on column cup_act.arg is 'Data associated with the act';
 comment on column cup_act.art is 'Outstanding debt DAI at block';
 comment on column cup_act.block is 'Tx block number';
 comment on column cup_act.deleted is 'True if the cup has been deleted (shut)';
+comment on column cup_act.guy is 'msg.sender';
 comment on column cup_act.id is 'The Cup ID';
 comment on column cup_act.ink is 'Locked collateral PETH at block';
 comment on column cup_act.ire is 'Outstanding debt DAI after fee at block';
@@ -45,6 +47,7 @@ CREATE VIEW public.cup AS
     block,
     deleted,
     id,
+    guy,
     ink,
     ire,
     lad,
@@ -60,6 +63,7 @@ CREATE VIEW public.cup AS
       block,
       deleted,
       id,
+      guy,
       ink,
       ire,
       lad,
@@ -77,6 +81,7 @@ comment on column cup.art is 'Outstanding debt DAI';
 comment on column cup.block is 'Block number at last update';
 comment on column cup_act.deleted is 'True if the cup has been deleted (shut)';
 comment on column cup.id is 'The Cup ID';
+comment on column cup.guy is 'msg.sender';
 comment on column cup.ink is 'Locked collateral PETH';
 comment on column cup.ire is 'Outstanding debt DAI after fee';
 comment on column cup.lad is 'The Cup owner';
