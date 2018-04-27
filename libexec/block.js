@@ -8,6 +8,7 @@ const tub = new lib.web3.eth.Contract(abI, lib.addresses.tub);
 
 export const sync = (n) => {
   return lib.web3.eth.getBlock(n)
+  .then(console.log(n))
   .then(block => write(n, block.timestamp))
 }
 
