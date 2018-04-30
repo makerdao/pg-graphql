@@ -27,7 +27,7 @@ const write = (log) => {
     act: 'open',
     arg: null,
     guy: log.returnValues.lad,
-    idx: log.transactionIndex,
+    idx: log.logIndex,
     block: log.blockNumber,
     tx: log.transactionHash
   }
