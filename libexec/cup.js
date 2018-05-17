@@ -50,5 +50,9 @@ const write = (log) => {
     lib.db.none(lib.sql.insertCup, { cup: data })
     console.log(data);
   })
-  .catch(e => console.log(e));
+  .catch(e => {
+    console.log(e)
+    console.log(lib.act.cupActs[log.returnValues.sig])
+    console.log(log)
+  });
 }
