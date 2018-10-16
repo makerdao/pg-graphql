@@ -4,7 +4,7 @@ const block  = require('../libexec/block');
 const gov    = require('../libexec/gov');
 const cup    = require('../libexec/cup');
 const newCup = require('../libexec/new-cup');
-const step   = process.env.BATCH || 400;
+const step   = parseInt(process.env.BATCH) || 400;
 
 // Backfill any blocks missing from the cache or
 // Overwrite all cached blocks prior to BLOCK if
@@ -36,7 +36,7 @@ const batchSync = (earliest, latest) => {
     else
       return batches(to-step, arr);
   }
-  require('bluebird').map(batches(latest), (o) => {
+  require('bluebird').map(batches(latest).reverse(), (o) => {
     return execSync(o.from, o.to);
   }, {concurrency: 1})
   .then(() => console.log("batchSync complete"));
