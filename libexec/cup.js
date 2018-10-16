@@ -28,9 +28,6 @@ const read = (log) => {
   return tub.methods.cups(log.returnValues.foo).call({}, log.blockNumber)
   .then(cup => {
     let act = lib.act.cupActs[log.returnValues.sig];
-    console.log(log.returnValues.sig)
-    console.log(log)
-    console.log(act)
     return {
       id: lib.web3.utils.hexToNumber(log.returnValues.foo),
       lad: cup.lad,

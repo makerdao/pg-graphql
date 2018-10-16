@@ -21,7 +21,7 @@
     "postgraphile": "^4.0.0-alpha2.33",
     "postgraphile-plugin-connection-filter": "^1.0.0-alpha.9",
     "ramda": "^0.25.0",
-    "web3": "^1.0.0-beta.36"
+    "web3": "1.0.0-beta.33"
   },
   "scripts": {
     "sync": "babel-node bin/sync.js",

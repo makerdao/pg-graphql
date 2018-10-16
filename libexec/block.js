@@ -51,7 +51,7 @@ const read = (n) => {
 //-----------------------------------------------
 // Sync All
 //-----------------------------------------------
-const concurrency = 100;
+const concurrency = 50;
 const diff = (a, b) => a - b;
 
 export const syncMissing = () => {
