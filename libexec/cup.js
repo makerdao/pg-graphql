@@ -28,6 +28,9 @@ const read = (log) => {
   return tub.methods.cups(log.returnValues.foo).call({}, log.blockNumber)
   .then(cup => {
     let act = lib.act.cupActs[log.returnValues.sig];
+    console.log(log.returnValues.sig)
+    console.log(log)
+    console.log(act)
     return {
       id: lib.web3.utils.hexToNumber(log.returnValues.foo),
       lad: cup.lad,
@@ -45,14 +48,17 @@ const read = (log) => {
 }
 
 const write = (log) => {
-  return read(log)
-  .then(data => {
-    lib.db.none(lib.sql.insertCup, { cup: data })
-    console.log(data);
-  })
-  .catch(e => {
-    console.log(e)
-    console.log(lib.act.cupActs[log.returnValues.sig])
-    console.log(log)
-  });
+  let act = lib.act.cupActs[log.returnValues.sig];
+  if(act) {
+    return read(log)
+    .then(data => {
+      lib.db.none(lib.sql.insertCup, { cup: data })
+      console.log(data);
+    })
+    .catch(e => {
+      console.log(e)
+      console.log(lib.act.cupActs[log.returnValues.sig])
+      console.log(log)
+    });
+  }
 }
