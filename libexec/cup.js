@@ -9,7 +9,7 @@ export const sync = (from, to) => {
     filter: {sig: lib.act.cupSigs}
   }
   return tub.getPastEvents('LogNote', options)
-  .then(logs => logs.forEach(log => write(log) ))
+  .then(logs => logs.forEach(log => write(log, log.blockNumber) ))
   .catch(e => console.log(e));
 }
 
@@ -20,12 +20,12 @@ export const subscribe = () => {
     if (e)
       console.log(e)
   })
-  .on("data", (event) => write(event))
+  .on("data", (event) => write(event, 'latest'))
   .on("error", console.log);
 }
 
-const read = (log) => {
-  return tub.methods.cups(log.returnValues.foo).call({}, log.blockNumber)
+const read = (log, n) => {
+  return tub.methods.cups(log.returnValues.foo).call({}, n)
   .then(cup => {
     let act = lib.act.cupActs[log.returnValues.sig];
     return {
@@ -44,10 +44,10 @@ const read = (log) => {
   });
 }
 
-const write = (log) => {
+const write = (log, n) => {
   let act = lib.act.cupActs[log.returnValues.sig];
   if(act) {
-    return read(log)
+    return read(log, n)
     .then(data => {
       lib.db.none(lib.sql.insertCup, { cup: data })
       console.log(data);
