@@ -9,7 +9,7 @@ COPY sql /opt/pg-graphql/sql
 COPY .babelrc /opt/pg-graphql/.babelrc
 COPY addr.json /opt/pg-graphql/addr.json
 COPY package.json /opt/pg-graphql/package.json
-COPY Profile /opt/pg-graphql/Profile
+COPY Procfile /opt/pg-graphql/Procfile
 
 WORKDIR /opt/pg-graphql
 RUN npm install
