@@ -7,7 +7,7 @@ services:
       - $ENV_FILE:/opt/pg-graphql/.env
     command: >
       bash -c "ENV=/opt/pg-graphql/.env npm run sync"
-    restart: on-failure
+    restart: always
 
   subscribe:
     image: makerdao/pg-graphql
