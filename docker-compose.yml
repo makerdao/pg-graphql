@@ -4,18 +4,18 @@ services:
     image: makerdao/pg-graphql
     container_name: sync
     volumes:
-      - $ENV_FILE:/opt/vulcan0x/.env
+      - $ENV_FILE:/opt/pg-graphql/.env
     command: >
-      bash -c "ENV=/opt/vulcan0x/.env npm run sync"
+      bash -c "ENV=/opt/pg-graphql/.env npm run sync"
     restart: on-failure
 
   subscribe:
     image: makerdao/pg-graphql
     container_name: subscribe
     volumes:
-      - $ENV_FILE:/opt/vulcan0x/.env
+      - $ENV_FILE:/opt/pg-graphql/.env
     command: >
-      bash -c "ENV=/opt/vulcan0x/.env npm run subscribe"
+      bash -c "ENV=/opt/pg-graphql/.env npm run subscribe"
     restart: always
 
   graphql:
@@ -24,7 +24,7 @@ services:
     ports:
       - 4000:4000
     volumes:
-      - $ENV_FILE:/opt/vulcan0x/.env
+      - $ENV_FILE:/opt/pg-graphql/.env
     command: >
-      bash -c "ENV=/opt/vulcan0x/.env npm run graphql"
+      bash -c "ENV=/opt/pg-graphql/.env npm run graphql"
     restart: always
