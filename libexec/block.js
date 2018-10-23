@@ -9,7 +9,7 @@ const tub = new lib.web3.eth.Contract(abI, lib.addresses.tub);
 export const sync = (n) => {
   return lib.web3.eth.getBlock(n)
   .then(console.log(n))
-  .then(block => write(n, n, block.timestamp))
+  .then(block => write(n, block.timestamp))
 }
 
 export const subscribe = () => {
@@ -17,12 +17,12 @@ export const subscribe = () => {
     if (e)
       console.log(e)
   })
-  .on("data", (b) => write('latest', b.number, b.timestamp))
+  .on("data", (b) => write(b.number, b.timestamp))
   .on("error", console.log);
 }
 
-const write = (b, n, timestamp) => {
-  return read(b)
+const write = (n, timestamp) => {
+  return read(n)
   .then(val => {
     return {
       n: n,
