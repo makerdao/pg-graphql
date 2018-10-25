@@ -24,5 +24,5 @@ VALUES (
   ${cup.guy},
   ${cup.idx}
 )
-ON CONFLICT ON CONSTRAINT tx_act_arg_idx
+ON CONFLICT ON CONSTRAINT id_tx_act_arg_idx
 DO NOTHING
