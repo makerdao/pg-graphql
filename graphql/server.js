@@ -10,11 +10,11 @@ const app = express();
 app.use(helmet());
 
 // Rendering options for the index page
-app.engine('html', require('ejs').renderFile);
+app.engine('ejs', require('ejs').renderFile);
 app.set('views', 'graphql/views');
 
 // Display a page at the subdomain root
-app.get('/', (req, res) => res.render('index.html'))
+app.get('/', (req, res) => res.render('index.ejs'))
 
 // Configure api routes
 const graphqlConfig = {
