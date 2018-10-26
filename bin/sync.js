@@ -4,7 +4,7 @@ const block  = require('../libexec/block');
 const gov    = require('../libexec/gov');
 const cup    = require('../libexec/cup');
 const newCup = require('../libexec/new-cup');
-const step   = parseInt(process.env.BATCH) || 400;
+const step   = parseInt(process.env.BATCH) || 1000;
 
 // Backfill any blocks missing from the cache or
 // Overwrite all cached blocks prior to BLOCK if
