@@ -4,8 +4,10 @@ const express          = require('express');
 const { postgraphile } = require('postgraphile');
 const FilterPlugin     = require('postgraphile-plugin-connection-filter');
 const RateLimit        = require('express-rate-limit');
+const helmet           = require('helmet');
 
 const app = express();
+app.use(helmet());
 
 // Rendering options for the index page
 app.engine('html', require('ejs').renderFile);
