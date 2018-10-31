@@ -26,6 +26,7 @@
   },
   "scripts": {
     "sync": "babel-node bin/sync.js",
+    "sync100": "babel-node bin/sync100.js",
     "subscribe": "babel-node bin/subscribe.js",
     "graphql": "babel-node graphql/server.js",
     "clean": "rm -rf dist && mkdir dist",

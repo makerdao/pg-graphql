@@ -70,7 +70,7 @@ export const syncFrom = (fromBlock) => {
   .catch(e => console.log(e));
 }
 
-const syncEach = (arr, f) => {
+export const syncEach = (arr, f) => {
   require('bluebird').map(arr, (n) => {
     return sync(n);
   }, {concurrency: concurrency})
@@ -84,7 +84,7 @@ const syncEach = (arr, f) => {
   });
 }
 
-const missingBlocks = (opts) => {
+export const missingBlocks = (opts) => {
   let options = R.merge(opts, { limit: concurrency })
   return lib.db.any(lib.sql.missingBlocks, options )
 }
