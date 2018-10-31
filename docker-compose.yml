@@ -8,6 +8,11 @@ services:
     command: >
       bash -c "ENV=/opt/pg-graphql/.env npm run sync"
     restart: always
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "100m"
+        max-file: "10"
 
   subscribe:
     image: makerdao/pg-graphql
@@ -17,6 +22,11 @@ services:
     command: >
       bash -c "ENV=/opt/pg-graphql/.env npm run subscribe"
     restart: always
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "100m"
+        max-file: "10"
 
   graphql:
     image: makerdao/pg-graphql
@@ -28,3 +38,8 @@ services:
     command: >
       bash -c "ENV=/opt/pg-graphql/.env npm run graphql"
     restart: always
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "100m"
+        max-file: "10"
