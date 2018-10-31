@@ -14,6 +14,20 @@ services:
         max-size: "100m"
         max-file: "10"
 
+  sync100:
+    image: makerdao/pg-graphql
+    container_name: sync100
+    volumes:
+      - $ENV_FILE:/opt/pg-graphql/.env
+    command: >
+      bash -c "ENV=/opt/pg-graphql/.env npm run sync100"
+    restart: always
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "100m"
+        max-file: "10"
+
   subscribe:
     image: makerdao/pg-graphql
     container_name: subscribe
