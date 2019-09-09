@@ -1,3 +1,5 @@
+import {deniedQueries} from './queries';
+
 require('dotenv').config()
 
 const express          = require('express');
@@ -32,6 +34,16 @@ const limiter = new RateLimit({
   delayMs: 100         // by 1 second
 });
 
+app.use(express.json())
+app.use(function (req, res, next) {
+  var query = req.body.query.replace(/(\r\n|\n|\r)/gm, "").replace(/ /g,'')
+  if (deniedQueries.indexOf(query) > -1) {
+      console.log('Sending 404 for query', req.body.query)
+      res.sendStatus(404)
+  } else {
+    next()
+  }
+})
 app.use(postgraphile(process.env.DATABASE_URL, 'public', graphqlConfig))
 
 app.listen(process.env.PORT);
